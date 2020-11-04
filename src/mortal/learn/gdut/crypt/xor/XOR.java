@@ -21,4 +21,15 @@ public class XOR extends JFrame {
         }
         return ciphertext;
     }
+
+    public byte[] decrpyt(byte[] ciphertext){
+        byte[] plaintext = new byte[ciphertext.length];
+        for(int i=0, j=0; i<ciphertext.length; i++){
+            plaintext[i] = (byte)(this.key[j] ^ ciphertext[i]);
+            j++;
+            if(key.length == j)
+                j = 0;
+        }
+        return plaintext;
+    }
 }
