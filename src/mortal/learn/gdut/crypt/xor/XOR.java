@@ -1,9 +1,10 @@
 package mortal.learn.gdut.crypt.xor;
 
 import javax.swing.*;
+import java.util.Arrays;
 import java.util.Objects;
 
-public class XOR extends JFrame {
+public class XOR {
     private byte[] key = null;
 
     public XOR(String key){
@@ -31,5 +32,13 @@ public class XOR extends JFrame {
                 j = 0;
         }
         return plaintext;
+    }
+
+    public byte[] getKey(){
+        return Arrays.copyOf(this.key,this.key.length);
+    }
+    public void setKey(String key){
+        Objects.requireNonNull(key);
+        this.key = key.getBytes();
     }
 }
