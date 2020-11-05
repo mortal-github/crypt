@@ -2,6 +2,58 @@ package mortal.learn.gdut.crypt.des;
 
 import mortal.learn.gdut.crypt.MyApp;
 public class DES {
+    private static int[][] MATRIX_IP;   //初始置换矩阵
+    private static int[][] MATRIX_IP_;  //逆初始置换矩阵
+    private static int[][] MATRIX_PS1;  //置换选择1
+    private static int[][] MATRIX_PS2;  //置换选择2
+
+    static{
+        DES.MATRIX_IP = new int[8][8];
+        DES.MATRIX_IP[0] = new int[] {58,50,42,34,26,18,10,2};
+        DES.MATRIX_IP[1] = new int[] {60,52,44,36,28,20,12,4};
+        DES.MATRIX_IP[2] = new int[] {62,54,46,38,30,22,14,6};
+        DES.MATRIX_IP[3] = new int[] {64,56,48,40,32,24,16,8};
+        DES.MATRIX_IP[4] = new int[] {57,49,41,33,25,17,9, 1};
+        DES.MATRIX_IP[5] = new int[] {59,51,43,35,27,19,11,3};
+        DES.MATRIX_IP[6] = new int[] {61,53,45,37,29,21,13,5};
+        DES.MATRIX_IP[7] = new int[] {63,55,47,39,31,23,15,7};
+    }
+    static{
+        DES.MATRIX_IP_ = new int[8][8];
+        DES.MATRIX_IP_[0] = new int[] {40, 8,48,16,56,24,64,32};
+        DES.MATRIX_IP_[1] = new int[] {39, 7,47,15,55,23,63,31};
+        DES.MATRIX_IP_[2] = new int[] {28, 6,46,14,54,22,62,30};
+        DES.MATRIX_IP_[3] = new int[] {37, 5,45,13,53,21,61,29};
+        DES.MATRIX_IP_[4] = new int[] {36, 4,44,12,52,20,60,28};
+        DES.MATRIX_IP_[5] = new int[] {35, 3,43,11,51,19,59,27};
+        DES.MATRIX_IP_[6] = new int[] {34, 2,42,10,50,18,58,26};
+        DES.MATRIX_IP_[7] = new int[] {33, 1,41, 9,49,17,57,25};
+    }
+    static{
+        DES.MATRIX_PS1 = new int[8][];
+        //C0
+        DES.MATRIX_PS1[0] = new int[]{57,49,41,33,25,17, 9, 1};
+        DES.MATRIX_PS1[1] = new int[]{58,50,42,34,26,18,10, 2};
+        DES.MATRIX_PS1[2] = new int[]{59,51,43,35,27,19,11, 3};
+        DES.MATRIX_PS1[3] = new int[]{60,52,44,36};
+        //D0
+        DES.MATRIX_PS1[4] = new int[]{63,55,47,39,31,23,15,7};
+        DES.MATRIX_PS1[5] = new int[]{62,54,46,38,30,22,14,6};
+        DES.MATRIX_PS1[6] = new int[]{61,53,45,37,29,21,13,5};
+        DES.MATRIX_PS1[7] = new int[]{28,20,12,4};
+    }
+    static{
+        DES.MATRIX_PS2 = new int[8][6];
+        DES.MATRIX_PS2[0] = new int[]{14,17,11,24, 1, 5};
+        DES.MATRIX_PS2[0] = new int[]{ 3,28,15, 6,21,10};
+        DES.MATRIX_PS2[0] = new int[]{23,19,12, 4,26, 8};
+        DES.MATRIX_PS2[0] = new int[]{16, 7,27,20,13, 2};
+        DES.MATRIX_PS2[0] = new int[]{41,52,31,37,47,55};
+        DES.MATRIX_PS2[0] = new int[]{30,40,51,45,33,48};
+        DES.MATRIX_PS2[0] = new int[]{44,49,39,56,34,53};
+        DES.MATRIX_PS2[0] = new int[]{46,42,50,36,29,32};
+    }
+
 
     /**
      * 初始置换矩阵，置换后数据第i*8+j位是i行j列元素所指的源数据的位。
