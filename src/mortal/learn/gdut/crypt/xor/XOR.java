@@ -1,9 +1,5 @@
 package mortal.learn.gdut.crypt.xor;
 
-import javax.swing.*;
-import java.util.Arrays;
-import java.util.Objects;
-
 public class XOR {
     public static byte[] xor(byte[]key, byte[] src){
         byte[] out = new byte[src.length];
