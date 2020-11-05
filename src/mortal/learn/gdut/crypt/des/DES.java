@@ -6,6 +6,7 @@ public class DES {
     private static int[][] MATRIX_IP_;  //逆初始置换矩阵
     private static int[][] MATRIX_PS1;  //置换选择1
     private static int[][] MATRIX_PS2;  //置换选择2
+    private static int[][] MATRIX_E;    //扩展选择运算E
 
     static{
         DES.MATRIX_IP = new int[8][8];
@@ -45,13 +46,24 @@ public class DES {
     static{
         DES.MATRIX_PS2 = new int[8][6];
         DES.MATRIX_PS2[0] = new int[]{14,17,11,24, 1, 5};
-        DES.MATRIX_PS2[0] = new int[]{ 3,28,15, 6,21,10};
-        DES.MATRIX_PS2[0] = new int[]{23,19,12, 4,26, 8};
-        DES.MATRIX_PS2[0] = new int[]{16, 7,27,20,13, 2};
-        DES.MATRIX_PS2[0] = new int[]{41,52,31,37,47,55};
-        DES.MATRIX_PS2[0] = new int[]{30,40,51,45,33,48};
-        DES.MATRIX_PS2[0] = new int[]{44,49,39,56,34,53};
-        DES.MATRIX_PS2[0] = new int[]{46,42,50,36,29,32};
+        DES.MATRIX_PS2[1] = new int[]{ 3,28,15, 6,21,10};
+        DES.MATRIX_PS2[2] = new int[]{23,19,12, 4,26, 8};
+        DES.MATRIX_PS2[3] = new int[]{16, 7,27,20,13, 2};
+        DES.MATRIX_PS2[4] = new int[]{41,52,31,37,47,55};
+        DES.MATRIX_PS2[5] = new int[]{30,40,51,45,33,48};
+        DES.MATRIX_PS2[6] = new int[]{44,49,39,56,34,53};
+        DES.MATRIX_PS2[7] = new int[]{46,42,50,36,29,32};
+    }
+    static{
+        DES.MATRIX_E = new int[8][6];
+        DES.MATRIX_E[0] = new int[]{32, 1, 2, 3, 4, 5};
+        DES.MATRIX_E[0] = new int[]{ 4, 5, 6, 7, 8, 9};
+        DES.MATRIX_E[0] = new int[]{ 8, 9,10,11,12,13};
+        DES.MATRIX_E[0] = new int[]{12,13,14,15,16,17};
+        DES.MATRIX_E[0] = new int[]{16,17,18,19,20,21};
+        DES.MATRIX_E[0] = new int[]{20,21,22,23,24,25};
+        DES.MATRIX_E[0] = new int[]{24,25,26,27,28,29};
+        DES.MATRIX_E[0] = new int[]{28,29,30,31,32, 1};
     }
 
 
@@ -420,8 +432,61 @@ public class DES {
         return keys;
     }
 
+    /**
+     * 扩展选择运算E。
+     * 选择运算E是一种扩展运算，它将32位数据扩展为48数据，以便与48位子密钥模2相加并满足替代函数组S对数据长度的要求。
+     * 选择运算矩阵。
+     * 32, 1, 2, 3, 4, 5
+     *  4, 5, 6, 7, 8, 9
+     *  8, 9,10,11,12,13
+     * 12,13,14,15,16,17
+     * 16,17,18,19,20,21
+     * 20,21,22,23,24,25
+     * 24,25,26,27,28,29
+     * 28,29,30,31,32, 1
+     * @param src 源数据，1~32位有效，将被扩展运算。
+     * @return out 扩展运算的结果，1~48位有效。
+     */
+    public static long E(long src){
+        long out = 0L;
+        int index = 0;
+
+        out |= ((src & (1L<<(31)))>>>(31))<<index;
+        index++;
+        for(int j=0; j<5; j++){
+            out |= ((src & (1L<<(j)))>>>(j))<<index;
+            index++;
+        }
+
+        for(int i=1; i<7; i++){
+            for(int j=-1; j<5; j++){
+                out |= ((src & (1L<<(i*4+j)))>>>(i*4+j))<<index;
+                index++;
+            }
+        }
+
+        for(int j=-1; j<4; j++){
+            out |= ((src & (1L<<(28L+j)))>>>(28+j))<<index;
+            index++;
+        }
+        out |= ((src & (1L<<(0)))>>>(0))<<index;
+        index++;
+
+        return out;
+    }
+
     public static void main(String[] args){
-        long key = ~((1L<<((60)-1)) + (1L<<((28)-1)));
-        DES.getSubKeys(key);
+
+        int i = 7;
+        int j = 4;
+        long index = 1L<<(i*6+j);
+        int m = 1<<(i*4-1+j);
+        long r = DES.E(m);
+        System.out.println(MyApp.bytes2string(MyApp.getBytes(index)));
+        System.out.println(MyApp.bytes2string(MyApp.getBytes(r)));
+
+        int m2 = ~m;
+        long r2 = DES.E(m2);
+        System.out.println(MyApp.bytes2string(MyApp.getBytes(r2)));
     }
 }
