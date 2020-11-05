@@ -139,9 +139,9 @@ public class App extends JFrame{
             out_tf.setText(result);
         });
 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
+        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.pack();
+        this.setVisible(false);
     }
     private byte[] string2bytes(String binary){
         int length = binary.length();
@@ -171,9 +171,5 @@ public class App extends JFrame{
             }
         }
         return new String(str);
-    }
-    public static void main(String[] args){
-        App app = new App();
-        app.setVisible(true);
     }
 }
