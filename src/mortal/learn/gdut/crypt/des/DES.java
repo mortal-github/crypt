@@ -7,6 +7,7 @@ public class DES {
     private static int[][] MATRIX_PS1;  //置换选择1
     private static int[][] MATRIX_PS2;  //置换选择2
     private static int[][] MATRIX_E;    //扩展选择运算E
+    private static int[][] MATRIX_P;    //置换运算P
 
     static{
         DES.MATRIX_IP = new int[8][8];
@@ -57,13 +58,24 @@ public class DES {
     static{
         DES.MATRIX_E = new int[8][6];
         DES.MATRIX_E[0] = new int[]{32, 1, 2, 3, 4, 5};
-        DES.MATRIX_E[0] = new int[]{ 4, 5, 6, 7, 8, 9};
-        DES.MATRIX_E[0] = new int[]{ 8, 9,10,11,12,13};
-        DES.MATRIX_E[0] = new int[]{12,13,14,15,16,17};
-        DES.MATRIX_E[0] = new int[]{16,17,18,19,20,21};
-        DES.MATRIX_E[0] = new int[]{20,21,22,23,24,25};
-        DES.MATRIX_E[0] = new int[]{24,25,26,27,28,29};
-        DES.MATRIX_E[0] = new int[]{28,29,30,31,32, 1};
+        DES.MATRIX_E[1] = new int[]{ 4, 5, 6, 7, 8, 9};
+        DES.MATRIX_E[2] = new int[]{ 8, 9,10,11,12,13};
+        DES.MATRIX_E[3] = new int[]{12,13,14,15,16,17};
+        DES.MATRIX_E[4] = new int[]{16,17,18,19,20,21};
+        DES.MATRIX_E[5] = new int[]{20,21,22,23,24,25};
+        DES.MATRIX_E[6] = new int[]{24,25,26,27,28,29};
+        DES.MATRIX_E[7] = new int[]{28,29,30,31,32, 1};
+    }
+    static{
+        DES.MATRIX_P = new int[8][4];
+        DES.MATRIX_P[0] = new int[]{16, 7,20,21};
+        DES.MATRIX_P[1] = new int[]{29,12,28,17};
+        DES.MATRIX_P[2] = new int[]{ 1,15,23,26};
+        DES.MATRIX_P[3] = new int[]{ 5,18,31,10};
+        DES.MATRIX_P[4] = new int[]{ 2, 8,24,14};
+        DES.MATRIX_P[5] = new int[]{32,27, 3, 9};
+        DES.MATRIX_P[6] = new int[]{19,13,30, 6};
+        DES.MATRIX_P[7] = new int[]{22,11, 4,25};
     }
 
 
@@ -474,19 +486,44 @@ public class DES {
 
         return out;
     }
-
+    /**
+     * 置换运算P。
+     * 置换运算P把S盒输出的32位数据打乱重排，得到32位加密函数输出。
+     * 用P置换来提供扩散，把S盒的混淆作用扩散开来。
+     * 置换矩阵P
+     * 16, 7,20,21
+     * 29,12,28,17
+     *  1,15,23,26
+     *  5,18,31,10
+     *  2, 8,24,14
+     * 32,27, 3, 9
+     * 19,13,30, 6
+     * 22,11, 4,25
+     * @param src 源数据，1~32位有效，将被置换运算P。
+     * @return out 置换运算P结果，1~32位有效。
+     */
+    public static long P(long src){
+        long out = 0L;
+        int index = 0;
+        for(int i=0; i<8; i++){
+            for(int j=0; j<4; j++){
+                out |= ((src & (1L<<(DES.MATRIX_P[i][j]-1)))>>>(DES.MATRIX_P[i][j]-1))<<index;
+                index++;
+            }
+        }
+        return out;
+    }
+    
     public static void main(String[] args){
+        for(int i=0; i<8; i++){
+            for(int j=0; j<4; j++){
+                long src = 1L<<(DES.MATRIX_P[i][j]-1);
+                long out = DES.P(src);
+                System.out.println(MyApp.bytes2string(MyApp.getBytes(src)));
+                System.out.println(MyApp.bytes2string(MyApp.getBytes(out)));
+                System.out.println("------------");
+            }
+        }
 
-        int i = 7;
-        int j = 4;
-        long index = 1L<<(i*6+j);
-        int m = 1<<(i*4-1+j);
-        long r = DES.E(m);
-        System.out.println(MyApp.bytes2string(MyApp.getBytes(index)));
-        System.out.println(MyApp.bytes2string(MyApp.getBytes(r)));
-
-        int m2 = ~m;
-        long r2 = DES.E(m2);
-        System.out.println(MyApp.bytes2string(MyApp.getBytes(r2)));
     }
 }
