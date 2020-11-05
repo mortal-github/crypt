@@ -387,19 +387,41 @@ public class DES {
 
         return out;
     }
+    /**
+     * 子密钥产生算法。
+     * 64位密钥，其中每一个字节的最高位为奇偶校验位，不是密钥位。
+     * 有效密钥为每一个字节前7位，共56位。
+     * 产生16个子密钥，每个子密钥48位。
+     * 1. 置换选择2
+     * 2. 循环左移与置换选择2产生一个48位子密钥
+     * @see DES#PS1(long)
+     * @see DES#PS2(long)
+     * @param key 密钥。其中8,16,24,32,40,48,56,64位为奇偶校验位。剩余位才是有效密钥位。
+     * @return keys 子密钥数组，keys[i]是第i个密钥，1~48位有效。
+     */
+    public static long[] getSubKeys(long key){
+        long[] keys = new long[16];
+        key = DES.PS1(key);
+        for(int i=0; i<16; i++){
+            //循环左移
+            System.out.println("i=" + i);
+            System.out.println("key = " +MyApp.bytes2string(MyApp.getBytes(key)));
+            key<<=1;
+
+            key = ((key & (1L<<28))>>>28) | (key & (~1L));
+            System.out.println("Ci  = " +MyApp.bytes2string(MyApp.getBytes(key)));
+
+            key = ((key & (1L<<56))>>>28) | (key & (~(1L<<28)));
+            System.out.println("Di  = " + MyApp.bytes2string(MyApp.getBytes(key)));
+            System.out.println("------------");
+            //置换选择2
+            keys[i] = DES.PS2(key);
+        }
+        return keys;
+    }
 
     public static void main(String[] args){
-        long index = 1L<<((48)-1);
-        long value1 = 1L<<((32)-1);
-        long value2 = ~value1;
-
-        long ps21 = DES.PS2(value1);
-        long ps22 = DES.PS2(value2);
-
-        System.out.println("value1 = " + MyApp.bytes2string(MyApp.getBytes(value1)));
-        System.out.println("sp21   = " + MyApp.bytes2string(MyApp.getBytes(ps21)));
-        System.out.println("index  = " + MyApp.bytes2string((MyApp.getBytes(index))));
-        System.out.println("value2 = " + MyApp.bytes2string(MyApp.getBytes(value2)));
-        System.out.println("ps22   = " + MyApp.bytes2string(MyApp.getBytes(ps22)));
+        long key = ~((1L<<((60)-1)) + (1L<<((28)-1)));
+        DES.getSubKeys(key);
     }
 }
