@@ -78,7 +78,7 @@ public class DES {
      * 62,54,46,38,30,22,14,6
      * 61,53,45,37,29,21,13,5
      * 28,20,12,4
-     * 若将密钥从地位到高位，依次将数据位排列成8*8矩阵。
+     * 若将密钥从低位到高位，依次将数据位排列成8*8矩阵。
      * 则置换矩阵C0即是
      * 1. 从第1行开始，从小到大遍历每一列，在每一列中，从第8行开始，从大到小遍历每一行。
      * 2. 直到遍历了3列
@@ -117,12 +117,237 @@ public class DES {
         }
         return out;
     }
+    /**
+     * 置换选择2。
+     * 将Ci和Pi合并成一个56位的中间数据，置换选择2从中选择出一个48位的子密钥。
+     * 置换选择2矩阵。
+     * 14,17,11,24, 1, 5
+     * 3,28,15, 6,21, 10
+     * 23,19,12, 4,26, 8
+     * 16, 7,27,20,13, 2
+     * 41,52,31,37,47,55
+     * 30,40,51,45,33,48
+     * 44,49,39,56,34,53
+     * 46,42,50,36,29,32
+     * 暂时没有找到规律，所以暴力置换。
+     * @see DES#PS1(long)
+     * @param src 源数据，Ci:1~28位，Di:29~56位，将被置换选择2。
+     * @return out 置换选择2的结果，Ci+1:1~28位，Di+1:29~56位。
+     */
+    public static long PS2(long src){
+        long out = 0;
+        //暴力置换
+        int i = 0;
+        int j ;
+
+        j = 14;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 17;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 11;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 24;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 1;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 5;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 3;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 28;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 15;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 6;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 21;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 10;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 23;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 19;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 12;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 4;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 26;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 8;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 16;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 7;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 27;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 20;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 13;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 2;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 41;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 52;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 31;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+
+        j = 37;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 47;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 55;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 30;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 40;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 51;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 45;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 33;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 48;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 44;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 49;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 39;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 56;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 34;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 53;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 46;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 42;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 50;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 36;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 29;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        j = 32;
+        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
+        i++;
+
+        return out;
+    }
 
     public static void main(String[] args){
-        long value = ~(1L<<(3));
-        long ps1 = DES.PS1(value);
+        long index = 1L<<((48)-1);
+        long value1 = 1L<<((32)-1);
+        long value2 = ~value1;
 
-        System.out.println("value = " + MyApp.bytes2string(MyApp.getBytes(value)));
-        System.out.println("ip    = " + MyApp.bytes2string(MyApp.getBytes(ps1)));
+        long ps21 = DES.PS2(value1);
+        long ps22 = DES.PS2(value2);
+
+        System.out.println("value1 = " + MyApp.bytes2string(MyApp.getBytes(value1)));
+        System.out.println("sp21   = " + MyApp.bytes2string(MyApp.getBytes(ps21)));
+        System.out.println("index  = " + MyApp.bytes2string((MyApp.getBytes(index))));
+        System.out.println("value2 = " + MyApp.bytes2string(MyApp.getBytes(value2)));
+        System.out.println("ps22   = " + MyApp.bytes2string(MyApp.getBytes(ps22)));
     }
 }
