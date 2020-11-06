@@ -2,80 +2,138 @@ package mortal.learn.gdut.crypt.des;
 
 import mortal.learn.gdut.crypt.MyApp;
 public class DES {
-    private static int[][] MATRIX_IP;   //初始置换矩阵
-    private static int[][] MATRIX_IP_;  //逆初始置换矩阵
-    private static int[][] MATRIX_PS1;  //置换选择1
-    private static int[][] MATRIX_PS2;  //置换选择2
-    private static int[][] MATRIX_E;    //扩展选择运算E
-    private static int[][] MATRIX_P;    //置换运算P
+    private static byte[][] MATRIX_IP;   //初始置换矩阵
+    private static byte[][] MATRIX_IP_;  //逆初始置换矩阵
+    private static byte[][] MATRIX_PS1;  //置换选择1
+    private static byte[][] MATRIX_PS2;  //置换选择2
+    private static byte[][] MATRIX_E;    //扩展选择运算E
+    private static byte[][] MATRIX_P;    //置换运算P
+    private static byte[][] SBox_1;      //S盒1
+    private static byte[][] SBox_2;      //S盒2
+    private static byte[][] SBox_3;      //S盒3
+    private static byte[][] SBox_4;      //S盒4
+    private static byte[][] SBox_5;      //S盒5
+    private static byte[][] SBox_6;      //S盒6
+    private static byte[][] SBox_7;      //S盒7
+    private static byte[][] SBox_8;      //S盒8
 
     static{
-        DES.MATRIX_IP = new int[8][8];
-        DES.MATRIX_IP[0] = new int[] {58,50,42,34,26,18,10,2};
-        DES.MATRIX_IP[1] = new int[] {60,52,44,36,28,20,12,4};
-        DES.MATRIX_IP[2] = new int[] {62,54,46,38,30,22,14,6};
-        DES.MATRIX_IP[3] = new int[] {64,56,48,40,32,24,16,8};
-        DES.MATRIX_IP[4] = new int[] {57,49,41,33,25,17,9, 1};
-        DES.MATRIX_IP[5] = new int[] {59,51,43,35,27,19,11,3};
-        DES.MATRIX_IP[6] = new int[] {61,53,45,37,29,21,13,5};
-        DES.MATRIX_IP[7] = new int[] {63,55,47,39,31,23,15,7};
+        DES.MATRIX_IP = new byte[8][8];
+        DES.MATRIX_IP[0] = new byte[] {58,50,42,34,26,18,10,2};
+        DES.MATRIX_IP[1] = new byte[] {60,52,44,36,28,20,12,4};
+        DES.MATRIX_IP[2] = new byte[] {62,54,46,38,30,22,14,6};
+        DES.MATRIX_IP[3] = new byte[] {64,56,48,40,32,24,16,8};
+        DES.MATRIX_IP[4] = new byte[] {57,49,41,33,25,17,9, 1};
+        DES.MATRIX_IP[5] = new byte[] {59,51,43,35,27,19,11,3};
+        DES.MATRIX_IP[6] = new byte[] {61,53,45,37,29,21,13,5};
+        DES.MATRIX_IP[7] = new byte[] {63,55,47,39,31,23,15,7};
     }
     static{
-        DES.MATRIX_IP_ = new int[8][8];
-        DES.MATRIX_IP_[0] = new int[] {40, 8,48,16,56,24,64,32};
-        DES.MATRIX_IP_[1] = new int[] {39, 7,47,15,55,23,63,31};
-        DES.MATRIX_IP_[2] = new int[] {28, 6,46,14,54,22,62,30};
-        DES.MATRIX_IP_[3] = new int[] {37, 5,45,13,53,21,61,29};
-        DES.MATRIX_IP_[4] = new int[] {36, 4,44,12,52,20,60,28};
-        DES.MATRIX_IP_[5] = new int[] {35, 3,43,11,51,19,59,27};
-        DES.MATRIX_IP_[6] = new int[] {34, 2,42,10,50,18,58,26};
-        DES.MATRIX_IP_[7] = new int[] {33, 1,41, 9,49,17,57,25};
+        DES.MATRIX_IP_ = new byte[8][8];
+        DES.MATRIX_IP_[0] = new byte[] {40, 8,48,16,56,24,64,32};
+        DES.MATRIX_IP_[1] = new byte[] {39, 7,47,15,55,23,63,31};
+        DES.MATRIX_IP_[2] = new byte[] {28, 6,46,14,54,22,62,30};
+        DES.MATRIX_IP_[3] = new byte[] {37, 5,45,13,53,21,61,29};
+        DES.MATRIX_IP_[4] = new byte[] {36, 4,44,12,52,20,60,28};
+        DES.MATRIX_IP_[5] = new byte[] {35, 3,43,11,51,19,59,27};
+        DES.MATRIX_IP_[6] = new byte[] {34, 2,42,10,50,18,58,26};
+        DES.MATRIX_IP_[7] = new byte[] {33, 1,41, 9,49,17,57,25};
     }
     static{
-        DES.MATRIX_PS1 = new int[8][];
+        DES.MATRIX_PS1 = new byte[8][];
         //C0
-        DES.MATRIX_PS1[0] = new int[]{57,49,41,33,25,17, 9, 1};
-        DES.MATRIX_PS1[1] = new int[]{58,50,42,34,26,18,10, 2};
-        DES.MATRIX_PS1[2] = new int[]{59,51,43,35,27,19,11, 3};
-        DES.MATRIX_PS1[3] = new int[]{60,52,44,36};
+        DES.MATRIX_PS1[0] = new byte[]{57,49,41,33,25,17, 9, 1};
+        DES.MATRIX_PS1[1] = new byte[]{58,50,42,34,26,18,10, 2};
+        DES.MATRIX_PS1[2] = new byte[]{59,51,43,35,27,19,11, 3};
+        DES.MATRIX_PS1[3] = new byte[]{60,52,44,36};
         //D0
-        DES.MATRIX_PS1[4] = new int[]{63,55,47,39,31,23,15,7};
-        DES.MATRIX_PS1[5] = new int[]{62,54,46,38,30,22,14,6};
-        DES.MATRIX_PS1[6] = new int[]{61,53,45,37,29,21,13,5};
-        DES.MATRIX_PS1[7] = new int[]{28,20,12,4};
+        DES.MATRIX_PS1[4] = new byte[]{63,55,47,39,31,23,15,7};
+        DES.MATRIX_PS1[5] = new byte[]{62,54,46,38,30,22,14,6};
+        DES.MATRIX_PS1[6] = new byte[]{61,53,45,37,29,21,13,5};
+        DES.MATRIX_PS1[7] = new byte[]{28,20,12,4};
     }
     static{
-        DES.MATRIX_PS2 = new int[8][6];
-        DES.MATRIX_PS2[0] = new int[]{14,17,11,24, 1, 5};
-        DES.MATRIX_PS2[1] = new int[]{ 3,28,15, 6,21,10};
-        DES.MATRIX_PS2[2] = new int[]{23,19,12, 4,26, 8};
-        DES.MATRIX_PS2[3] = new int[]{16, 7,27,20,13, 2};
-        DES.MATRIX_PS2[4] = new int[]{41,52,31,37,47,55};
-        DES.MATRIX_PS2[5] = new int[]{30,40,51,45,33,48};
-        DES.MATRIX_PS2[6] = new int[]{44,49,39,56,34,53};
-        DES.MATRIX_PS2[7] = new int[]{46,42,50,36,29,32};
+        DES.MATRIX_PS2 = new byte[8][6];
+        DES.MATRIX_PS2[0] = new byte[]{14,17,11,24, 1, 5};
+        DES.MATRIX_PS2[1] = new byte[]{ 3,28,15, 6,21,10};
+        DES.MATRIX_PS2[2] = new byte[]{23,19,12, 4,26, 8};
+        DES.MATRIX_PS2[3] = new byte[]{16, 7,27,20,13, 2};
+        DES.MATRIX_PS2[4] = new byte[]{41,52,31,37,47,55};
+        DES.MATRIX_PS2[5] = new byte[]{30,40,51,45,33,48};
+        DES.MATRIX_PS2[6] = new byte[]{44,49,39,56,34,53};
+        DES.MATRIX_PS2[7] = new byte[]{46,42,50,36,29,32};
     }
     static{
-        DES.MATRIX_E = new int[8][6];
-        DES.MATRIX_E[0] = new int[]{32, 1, 2, 3, 4, 5};
-        DES.MATRIX_E[1] = new int[]{ 4, 5, 6, 7, 8, 9};
-        DES.MATRIX_E[2] = new int[]{ 8, 9,10,11,12,13};
-        DES.MATRIX_E[3] = new int[]{12,13,14,15,16,17};
-        DES.MATRIX_E[4] = new int[]{16,17,18,19,20,21};
-        DES.MATRIX_E[5] = new int[]{20,21,22,23,24,25};
-        DES.MATRIX_E[6] = new int[]{24,25,26,27,28,29};
-        DES.MATRIX_E[7] = new int[]{28,29,30,31,32, 1};
+        DES.MATRIX_E = new byte[8][6];
+        DES.MATRIX_E[0] = new byte[]{32, 1, 2, 3, 4, 5};
+        DES.MATRIX_E[1] = new byte[]{ 4, 5, 6, 7, 8, 9};
+        DES.MATRIX_E[2] = new byte[]{ 8, 9,10,11,12,13};
+        DES.MATRIX_E[3] = new byte[]{12,13,14,15,16,17};
+        DES.MATRIX_E[4] = new byte[]{16,17,18,19,20,21};
+        DES.MATRIX_E[5] = new byte[]{20,21,22,23,24,25};
+        DES.MATRIX_E[6] = new byte[]{24,25,26,27,28,29};
+        DES.MATRIX_E[7] = new byte[]{28,29,30,31,32, 1};
     }
     static{
-        DES.MATRIX_P = new int[8][4];
-        DES.MATRIX_P[0] = new int[]{16, 7,20,21};
-        DES.MATRIX_P[1] = new int[]{29,12,28,17};
-        DES.MATRIX_P[2] = new int[]{ 1,15,23,26};
-        DES.MATRIX_P[3] = new int[]{ 5,18,31,10};
-        DES.MATRIX_P[4] = new int[]{ 2, 8,24,14};
-        DES.MATRIX_P[5] = new int[]{32,27, 3, 9};
-        DES.MATRIX_P[6] = new int[]{19,13,30, 6};
-        DES.MATRIX_P[7] = new int[]{22,11, 4,25};
+        DES.MATRIX_P = new byte[8][4];
+        DES.MATRIX_P[0] = new byte[]{16, 7,20,21};
+        DES.MATRIX_P[1] = new byte[]{29,12,28,17};
+        DES.MATRIX_P[2] = new byte[]{ 1,15,23,26};
+        DES.MATRIX_P[3] = new byte[]{ 5,18,31,10};
+        DES.MATRIX_P[4] = new byte[]{ 2, 8,24,14};
+        DES.MATRIX_P[5] = new byte[]{32,27, 3, 9};
+        DES.MATRIX_P[6] = new byte[]{19,13,30, 6};
+        DES.MATRIX_P[7] = new byte[]{22,11, 4,25};
+    }
+    static{
+        DES.SBox_1 = new byte[4][16];
+        DES.SBox_2 = new byte[4][16];
+        DES.SBox_3 = new byte[4][16];
+        DES.SBox_4 = new byte[4][16];
+        DES.SBox_5 = new byte[4][16];
+        DES.SBox_6 = new byte[4][16];
+        DES.SBox_7 = new byte[4][16];
+        DES.SBox_8 = new byte[4][16];
+
+        DES.SBox_1[0] = new byte[]{14, 4,13, 1, 2,15,11, 8, 3,10, 6,12, 5, 9, 0, 7};
+        DES.SBox_1[1] = new byte[]{ 0,15, 7, 4,14, 2,13, 1,10, 6,12,11, 9, 5, 3, 8};
+        DES.SBox_1[2] = new byte[]{ 4, 1,14, 8,13, 6, 2,11,15,12, 9, 7, 3,10, 5, 0};
+        DES.SBox_1[3] = new byte[]{15,12, 8, 2, 4, 9, 1, 7, 5,11, 3,14,10, 0, 6,13};
+
+        DES.SBox_2[0] = new byte[]{15, 1, 8,14, 6,11, 3, 4, 9, 7, 2,13,12, 0, 5,10};
+        DES.SBox_2[1] = new byte[]{ 3,13, 4, 7,15, 2, 8,14,12, 0, 1,10, 6, 9,11, 5};
+        DES.SBox_2[2] = new byte[]{ 0,14, 7,11,10, 4,13, 1, 5, 8,12, 6, 9, 3, 2,15};
+        DES.SBox_2[3] = new byte[]{13, 8,10, 1, 3,15, 4, 2,11, 6, 7,12, 0, 5,14, 9};
+
+        DES.SBox_3[0] = new byte[]{10, 0, 9,14, 6, 3,15, 5, 1,13,12, 7,11, 4, 2, 8};
+        DES.SBox_3[1] = new byte[]{13, 7, 0, 9, 3, 4, 6,10, 2, 8, 5,14,12,11,15, 1};
+        DES.SBox_3[2] = new byte[]{13, 6, 4, 9, 8,15, 3, 0,11, 1, 2,12, 5,10,14, 7};
+        DES.SBox_3[3] = new byte[]{ 1,10,13, 0, 6, 9, 8, 7, 4,15,14, 3,11, 5, 2,12};
+
+        DES.SBox_4[0] = new byte[]{ 7,13,14, 3, 0, 6, 9,10, 1, 2, 8, 5,11,12, 4,15};
+        DES.SBox_4[1] = new byte[]{13, 8,11, 5, 6,15, 0, 3, 4, 7, 2,12, 1,10,14, 9};
+        DES.SBox_4[2] = new byte[]{10, 6, 9, 0,12,11, 7,13,15, 1, 3,14, 5, 2, 8, 4};
+        DES.SBox_4[3] = new byte[]{ 3,15, 0, 6,10, 1,13, 8, 9, 4, 5,11,12, 7, 2,14};
+
+        DES.SBox_5[0] = new byte[]{ 2,12, 4, 1, 7,10,11, 6, 8, 5, 3,15,13, 0,14, 9};
+        DES.SBox_5[1] = new byte[]{14,11, 2,12, 4, 7,13, 1, 5, 0,15,10, 3, 9, 8, 6};
+        DES.SBox_5[2] = new byte[]{ 4, 2, 1,11,10,13, 7, 8,15, 9,12, 5, 6, 3, 0,14};
+        DES.SBox_5[3] = new byte[]{11, 8,12, 7, 1,14, 2,13, 6,15, 0, 9,10, 4, 5, 3};
+
+        DES.SBox_6[0] = new byte[]{12, 1,10,15, 9, 2, 6, 8, 0,13, 3, 4,14, 7, 5,11};
+        DES.SBox_6[1] = new byte[]{10,15, 4, 2, 7,12, 9, 5, 6, 1,13,14, 0,11, 3, 8};
+        DES.SBox_6[2] = new byte[]{ 9,14,15, 5, 2, 8,12, 3, 7, 0, 4,10, 1,13,11, 6};
+        DES.SBox_6[3] = new byte[]{ 4, 3, 2,12, 9, 5,15,10,11,14, 1, 7, 6, 0, 8,13};
+
+        DES.SBox_7[0] = new byte[]{ 4,11, 2,14,15, 0, 8,13, 3,12, 9, 7, 5,10, 6, 1};
+        DES.SBox_7[1] = new byte[]{13, 0,11, 7, 4, 9, 1,10,14, 3, 5,12, 2,15, 8, 6};
+        DES.SBox_7[2] = new byte[]{ 1, 4,11,13,12, 3, 7,14,10,15, 6, 8, 0, 5, 9, 2};
+        DES.SBox_7[3] = new byte[]{ 6,11,13, 8, 1, 4,10, 7, 9, 5, 0,15,14, 2, 3,12};
+
+        DES.SBox_8[0] = new byte[]{13, 2, 8, 4, 6,15,11, 1,10, 9, 3,14, 5, 0,12, 7};
+        DES.SBox_8[1] = new byte[]{ 1,15,13, 8,10, 3, 7, 4,12, 5, 6,11, 0,14, 9, 2};
+        DES.SBox_8[2] = new byte[]{ 7,11, 4, 1, 9,12,14, 2, 0, 6,10,13,15, 3, 5, 8};
+        DES.SBox_8[3] = new byte[]{ 2, 1,14, 7, 4,10, 8,13,15,12, 9, 0, 3, 5, 6,11};
     }
 
 
@@ -211,204 +269,14 @@ public class DES {
      * @return out 置换选择2的结果，Ci+1:1~28位，Di+1:29~56位。
      */
     public static long PS2(long src){
-        long out = 0;
-        //暴力置换
-        int i = 0;
-        int j ;
-
-        j = 14;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 17;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 11;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 24;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 1;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 5;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 3;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 28;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 15;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 6;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 21;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 10;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 23;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 19;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 12;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 4;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 26;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 8;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 16;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 7;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 27;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 20;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 13;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 2;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 41;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 52;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 31;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-
-        j = 37;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 47;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 55;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 30;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 40;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 51;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 45;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 33;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 48;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 44;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 49;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 39;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 56;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 34;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 53;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 46;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 42;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 50;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 36;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 29;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
-        j = 32;
-        out |= ((src & (1L<<(j-1)))>>>(j-1))<<i;
-        i++;
-
+        long out = 0L;
+        int index = 0;
+        for(int i=0; i<8; i++){
+            for(int j=0; j<6; j++){
+                out |= ((src & (1L<<(DES.MATRIX_PS2[i][j]-1)))>>>(DES.MATRIX_PS2[i][j]-1))<<index;
+                index++;
+            }
+        }
         return out;
     }
     /**
@@ -482,7 +350,6 @@ public class DES {
             index++;
         }
         out |= ((src & (1L<<(0)))>>>(0))<<index;
-        index++;
 
         return out;
     }
@@ -513,17 +380,8 @@ public class DES {
         }
         return out;
     }
-    
+
     public static void main(String[] args){
-        for(int i=0; i<8; i++){
-            for(int j=0; j<4; j++){
-                long src = 1L<<(DES.MATRIX_P[i][j]-1);
-                long out = DES.P(src);
-                System.out.println(MyApp.bytes2string(MyApp.getBytes(src)));
-                System.out.println(MyApp.bytes2string(MyApp.getBytes(out)));
-                System.out.println("------------");
-            }
-        }
 
     }
 }
