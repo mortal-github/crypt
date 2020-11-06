@@ -16,6 +16,7 @@ public class DES {
     private static byte[][] SBox_6;      //S盒6
     private static byte[][] SBox_7;      //S盒7
     private static byte[][] SBox_8;      //S盒8
+    private static byte[][][] SBox;      //所有的8个S盒
 
     static{
         DES.MATRIX_IP = new byte[8][8];
@@ -135,7 +136,16 @@ public class DES {
         DES.SBox_8[2] = new byte[]{ 7,11, 4, 1, 9,12,14, 2, 0, 6,10,13,15, 3, 5, 8};
         DES.SBox_8[3] = new byte[]{ 2, 1,14, 7, 4,10, 8,13,15,12, 9, 0, 3, 5, 6,11};
     }
-
+    static{
+        DES.SBox[0] = DES.SBox_1;
+        DES.SBox[1] = DES.SBox_2;
+        DES.SBox[2] = DES.SBox_3;
+        DES.SBox[3] = DES.SBox_4;
+        DES.SBox[4] = DES.SBox_5;
+        DES.SBox[5] = DES.SBox_6;
+        DES.SBox[6] = DES.SBox_7;
+        DES.SBox[7] = DES.SBox_8;
+    }
 
     /**
      * 初始置换矩阵，置换后数据第i*8+j位是i行j列元素所指的源数据的位。
@@ -380,6 +390,36 @@ public class DES {
         }
         return out;
     }
+    /**
+     * 加密函数。
+     * 32位数据，与48位子密钥加密，获取加密数据。
+     * @see DES#E(long)
+     * @see DES#P(long)
+     * @see DES#SBox
+     * @param src   源数据，1~32位有效。
+     * @param key   子密钥，1~48位有效。
+     * @return out  加密结果，1~32位有效。
+     */
+    public static long F(long src, long key){
+        //扩展运算
+        long E_src = DES.E(src);
+        //中间结果
+        long middle = E_src^key;
+        //S盒输出
+        long SBox_out = 0L;
+        for(int i=0; i<8; i++){
+            //行号b6b1,列号，b5b4b3b2
+            int row = (int)((middle & 0b1L) | ((middle & 0b100000L)>>>4));
+            int col = (int)((middle & 0b11110L)>>>1);
+            SBox_out |= ((long)DES.SBox[i][row][col])<<(i*4);
+            middle<<=6;
+        }
+        //置换运算P。
+        long out = DES.P(SBox_out);
+
+        return out;
+    }
+
 
     public static void main(String[] args){
 
