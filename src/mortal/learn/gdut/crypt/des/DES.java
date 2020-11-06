@@ -1,6 +1,10 @@
 package mortal.learn.gdut.crypt.des;
 
 import mortal.learn.gdut.crypt.MyApp;
+
+import java.util.Arrays;
+import java.util.Random;
+
 public class DES {
     private static byte[][] MATRIX_IP;   //初始置换矩阵
     private static byte[][] MATRIX_IP_;  //逆初始置换矩阵
@@ -137,6 +141,7 @@ public class DES {
         DES.SBox_8[3] = new byte[]{ 2, 1,14, 7, 4,10, 8,13,15,12, 9, 0, 3, 5, 6,11};
     }
     static{
+        DES.SBox = new byte[8][][];
         DES.SBox[0] = DES.SBox_1;
         DES.SBox[1] = DES.SBox_2;
         DES.SBox[2] = DES.SBox_3;
@@ -232,7 +237,7 @@ public class DES {
      * 2. 直到遍历了3列。
      * 3. 将第4列，从第4行开始，从大到小遍历4个元素。
      * @param src 源数据，将被置换选择1。
-     * @return out 置换选择1的结果。C0:1~28位，D0:29~56位。
+     * @return out 置换选择1的结果。C0:1~28位，D0:29~56位，57~64位恒为0。
      */
     public static long PS1(long src){
         long out = 0L;
@@ -276,7 +281,7 @@ public class DES {
      * 暂时没有找到规律，所以暴力置换。
      * @see DES#PS1(long)
      * @param src 源数据，Ci:1~28位，Di:29~56位，将被置换选择2。
-     * @return out 置换选择2的结果，Ci+1:1~28位，Di+1:29~56位。
+     * @return out 置换选择2的结果，子密钥，1~48位有效，49~64恒为0。
      */
     public static long PS2(long src){
         long out = 0L;
@@ -299,23 +304,16 @@ public class DES {
      * @see DES#PS1(long)
      * @see DES#PS2(long)
      * @param key 密钥。其中8,16,24,32,40,48,56,64位为奇偶校验位。剩余位才是有效密钥位。
-     * @return keys 子密钥数组，keys[i]是第i个密钥，1~48位有效。
+     * @return keys 子密钥数组，keys[i]是第i个密钥，1~48位有效，49~64位恒为0。
      */
     public static long[] getSubKeys(long key){
         long[] keys = new long[16];
         key = DES.PS1(key);
         for(int i=0; i<16; i++){
             //循环左移
-            System.out.println("i=" + i);
-            System.out.println("key = " +MyApp.bytes2string(MyApp.getBytes(key)));
             key<<=1;
-
             key = ((key & (1L<<28))>>>28) | (key & (~1L));
-            System.out.println("Ci  = " +MyApp.bytes2string(MyApp.getBytes(key)));
-
             key = ((key & (1L<<56))>>>28) | (key & (~(1L<<28)));
-            System.out.println("Di  = " + MyApp.bytes2string(MyApp.getBytes(key)));
-            System.out.println("------------");
             //置换选择2
             keys[i] = DES.PS2(key);
         }
@@ -335,7 +333,7 @@ public class DES {
      * 24,25,26,27,28,29
      * 28,29,30,31,32, 1
      * @param src 源数据，1~32位有效，将被扩展运算。
-     * @return out 扩展运算的结果，1~48位有效。
+     * @return out 扩展运算的结果，1~48位有效，49~64位恒为0。
      */
     public static long E(long src){
         long out = 0L;
@@ -377,7 +375,7 @@ public class DES {
      * 19,13,30, 6
      * 22,11, 4,25
      * @param src 源数据，1~32位有效，将被置换运算P。
-     * @return out 置换运算P结果，1~32位有效。
+     * @return out 置换运算P结果，1~32位有效，33~64位恒为0。
      */
     public static long P(long src){
         long out = 0L;
@@ -398,7 +396,7 @@ public class DES {
      * @see DES#SBox
      * @param src   源数据，1~32位有效。
      * @param key   子密钥，1~48位有效。
-     * @return out  加密结果，1~32位有效。
+     * @return out  加密结果，1~32位有效，33~64位恒为0。
      */
     public static long F(long src, long key){
         //扩展运算
@@ -411,17 +409,108 @@ public class DES {
             //行号b6b1,列号，b5b4b3b2
             int row = (int)((middle & 0b1L) | ((middle & 0b100000L)>>>4));
             int col = (int)((middle & 0b11110L)>>>1);
-            SBox_out |= ((long)DES.SBox[i][row][col])<<(i*4);
-            middle<<=6;
+            SBox_out |= (( ((long)DES.SBox[i][row][col]) & 0b1111L)<<(i*4));
+            middle>>>=6;
         }
         //置换运算P。
-        long out = DES.P(SBox_out);
+        return DES.P(SBox_out);
+    }
+
+    /**
+     * DES轮运算。
+     * DES加密，多轮运算，轮数等于子密钥数量，每轮依次使用一个子密钥进行加密运算。
+     * 每个子密钥1~48位有效。
+     * 可用用加密，解密(颠倒子密钥顺序即可)。
+     * @param src 源数据，将被加密。
+     * @param keys 子密钥序列，将被依次用来加密。每个子密钥1~48位有效。
+     * @return out 加密结果。
+     */
+    public static long R(long src, long... keys){
+        //初始置换
+        long out = DES.IP(src);
+        int L = (int)(out & 0xffffffffL);//取前32位。
+        int R = (int)(out>>>32); //逻辑右移，取后32位，
+        int T ;
+        for(long key: keys){
+            //加密
+            L ^= (int)DES.F(R,key);
+            //R = R;
+            //变换位置。
+            T = L;
+            L = R;
+            R = T;
+        }
+        //最后一次加密，不变换位置。
+        out = ((long)R) & 0xffffffffL;//负数导致高位填充1。
+        out |= ((long)L)<<32;
+        //逆初始置换
+        out = DES.IP_(out);
 
         return out;
     }
-
+    /**
+     * DES加密。
+     * 使用子密钥产生算法产生子密钥，使用DES轮运算实现加密。
+     * 每次加密一组字节，每组字节8位，故直接用long数据类型。
+     * 密钥key每字节最高位是奇偶检验位。有效密钥位共56位。
+     * 使用密钥给明文DES加密。
+     * @see DES#getSubKeys(long)
+     * @see DES#R(long, long...)
+     * @param key  56位DES密钥。
+     * @param src  明文8字节组序列。
+     * @return out DES加密结果。
+     */
+    public static long[] encrypt(long key, long...src){
+        //获取加密子密钥
+        long[] keys = DES.getSubKeys(key);
+        //解密
+        long[] out = new long[src.length];
+        for(int i=0; i<out.length; i++){
+            out[i] = DES.R(src[i],keys);
+        }
+        return out;
+    }
+    /**
+     * DES解密。
+     * 使用子密钥产生算法产生子密钥，使用DES轮运算实现解密。
+     * 每次解密一组字节，每组字节8位，故直接用long数据类型。
+     * 密钥key每字节最高位是奇偶检验位。有效密钥位共56位。
+     * 使用密钥给明文DES加密。
+     * @see DES#getSubKeys(long)
+     * @see DES#R(long, long...)
+     * @param key  56位DES密钥。
+     * @param src  密文8字节组序列。
+     * @return out DES解密结果。
+     */
+    public static long[] decrypt(long key, long...src){
+        //获取加密子密钥
+        long[] keys = DES.getSubKeys(key);
+        //获取解密子密钥
+        for(int i=0; i<keys.length/2; i++){
+            long temp = keys[i];
+            keys[i] = keys[keys.length-1-i];
+            keys[keys.length-1-i] = temp;
+        }
+        //解密
+        long[] out = new long[src.length];
+        for(int i=0; i<out.length; i++){
+            out[i] = DES.R(src[i],keys);
+        }
+        return out;
+    }
 
     public static void main(String[] args){
+        Random random = new Random();
+        long k = random.nextLong();
+        int count = random.nextInt();
 
+        for(int i=1; i<count; i++){
+            long[] p = new long[] {random.nextLong()};
+            long[] e = DES.encrypt(k,p);
+            long[] d = DES.decrypt(k,e);
+
+            if(p[0] != d[0])
+                System.out.println("false");
+        }
     }
 }
