@@ -9,23 +9,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class App extends JFrame{
+public class XorApp extends JFrame{
     private final JFileChooser chooser = new JFileChooser();
     private byte[] key = new byte[]{1,2,3,4,5,6,7,8,9};
     private byte[] src = new byte[]{1,2,3,4,5,6,7,8,9};
     private byte[] out = new byte[]{1,2,3,4,5,6,7,8,9};
 
-    private GridBagConstraints get(int grid_width, int weight_x) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridy = GridBagConstraints.RELATIVE;
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridheight = 1;
-        constraints.gridwidth = grid_width;
-        constraints.weighty = 0;
-        constraints.weightx = weight_x;
-        return constraints;
-    }
-    public App(){
+    public XorApp(){
         chooser.setCurrentDirectory(new File("."));
         JPanel panel = new JPanel();
         this.add(panel);
@@ -35,12 +25,12 @@ public class App extends JFrame{
         JRadioButton pw_str = new JRadioButton("字符串", true);
         JRadioButton pw_bin = new JRadioButton("二进制串", false);
         JRadioButton pw_fle = new JRadioButton("数据文件",false);
-        JTextField pw_tf = new JTextField("123456789",64);
-        panel.add(pw_lb, get(1,0));
-        panel.add(pw_str, get(1,0));
-        panel.add(pw_bin, get(1,0));
-        panel.add(pw_fle, get(1,0));
-        panel.add(pw_tf, get(0,100));
+        JTextField pw_tf = new JTextField("123456789",50);
+        panel.add(pw_lb, MyApp.get(1,0));
+        panel.add(pw_str, MyApp.get(1,0));
+        panel.add(pw_bin, MyApp.get(1,0));
+        panel.add(pw_fle, MyApp.get(1,0));
+        panel.add(pw_tf, MyApp.get(0,100));
 
         ButtonGroup pw_bg = new ButtonGroup();
         pw_bg.add(pw_str);
@@ -51,12 +41,12 @@ public class App extends JFrame{
         JRadioButton da_str = new JRadioButton("字符串", true);
         JRadioButton da_bin = new JRadioButton("二进制串", false);
         JRadioButton da_fle = new JRadioButton("数据文件",false);
-        JTextField da_tf = new JTextField("123456789", 64);
-        panel.add(da_lb, get(1,0));
-        panel.add(da_str, get(1,0));
-        panel.add(da_bin, get(1,0));
-        panel.add(da_fle, get(1,0));
-        panel.add(da_tf, get(0,100));
+        JTextField da_tf = new JTextField("123456789", 50);
+        panel.add(da_lb, MyApp.get(1,0));
+        panel.add(da_str, MyApp.get(1,0));
+        panel.add(da_bin, MyApp.get(1,0));
+        panel.add(da_fle, MyApp.get(1,0));
+        panel.add(da_tf, MyApp.get(0,100));
 
         ButtonGroup da_bg = new ButtonGroup();
         da_bg.add(da_bin);
@@ -65,10 +55,10 @@ public class App extends JFrame{
 
         JLabel out_lb = new JLabel("输出：");
         JButton crypt = new JButton("加密/解密");
-        JTextField out_tf = new JTextField("123456789",64);
-        panel.add(out_lb,get(1,0));
-        panel.add(crypt,get(3,0));
-        panel.add(out_tf,get(0,100));
+        JTextField out_tf = new JTextField("123456789",50);
+        panel.add(out_lb,MyApp.get(1,0));
+        panel.add(crypt,MyApp.get(3,0));
+        panel.add(out_tf,MyApp.get(0,100));
 
         pw_fle.addActionListener(event->{
             int result = this.chooser.showOpenDialog(this);
@@ -130,8 +120,12 @@ public class App extends JFrame{
             out_tf.setText(result);
         });
 
+        this.setTitle("异或加密字符串或文件。");
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.pack();
+        this.setResizable(false);
+        Dimension screen = this.getToolkit().getScreenSize();
+        this.setLocation((screen.width-this.getWidth())/2,(screen.height-this.getHeight())/2);
         this.setVisible(false);
     }
 }

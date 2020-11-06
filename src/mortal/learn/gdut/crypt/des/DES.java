@@ -1,10 +1,5 @@
 package mortal.learn.gdut.crypt.des;
 
-import mortal.learn.gdut.crypt.MyApp;
-
-import java.util.Arrays;
-import java.util.Random;
-
 public class DES {
     private static byte[][] MATRIX_IP;   //初始置换矩阵
     private static byte[][] MATRIX_IP_;  //逆初始置换矩阵
@@ -497,20 +492,5 @@ public class DES {
             out[i] = DES.R(src[i],keys);
         }
         return out;
-    }
-
-    public static void main(String[] args){
-        Random random = new Random();
-        long k = random.nextLong();
-        int count = random.nextInt();
-
-        for(int i=1; i<count; i++){
-            long[] p = new long[] {random.nextLong()};
-            long[] e = DES.encrypt(k,p);
-            long[] d = DES.decrypt(k,e);
-
-            if(p[0] != d[0])
-                System.out.println("false");
-        }
     }
 }
