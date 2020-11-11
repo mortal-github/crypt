@@ -15,6 +15,7 @@ public class MyApp {
             frame.setVisible(true);
             Dimension screen = frame.getToolkit().getScreenSize();
             frame.setBounds(screen.width/4, screen.height/4,screen.width/2,screen.height/2);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             JPanel panel = new JPanel();
             frame.add(panel);
 
