@@ -5,10 +5,12 @@ import mortal.learn.gdut.crypt.xor.XorApp;
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigInteger;
+import java.util.Random;
 
 public class MyApp {
 
-    public static void main(String[] args){
+    public static void show(String[] args){
         EventQueue.invokeLater(()->{
             JFrame frame = new JFrame();
             frame.setTitle("密码学作业——3118005434钟景文，信息安全18(2)班");
@@ -86,5 +88,56 @@ public class MyApp {
         constraints.weighty = 0;
         constraints.weightx = weight_x;
         return constraints;
+    }
+
+    /**
+     *
+     * @param m
+     * @param e
+     * @param n
+     * @return
+     */
+    public static BigInteger ExpMod(BigInteger m, BigInteger e, BigInteger n){
+        BigInteger c = BigInteger.valueOf(1L);
+        byte[] e_b = e.toByteArray();//大端
+        for(int i=0; i<e_b.length; i++){
+            for(int j=7; j>-1; j--){
+                c = c.multiply(c);
+                c = c.mod(n);
+                if(0 != (e_b[i] & (1<<j))){
+                    c = c.multiply(m);
+                    c = c.mod(n);
+                }
+            }
+        }
+        return c;
+    }
+
+    public static BigInteger Exp(BigInteger a, BigInteger b){
+        BigInteger r = BigInteger.valueOf(1L);
+        byte[] e_b = b.toByteArray();//大端
+        for(int i=0; i<e_b.length; i++){
+            for(int j=7; j>-1; j--){
+                r = r.multiply(r);
+                if(0 != (e_b[i] & (1<<j))){
+                    r = r.multiply(a);
+                }
+            }
+        }
+        return r;
+    }
+
+    public static void main(String[] args){
+        //MyApp.show(args);
+        BigInteger m = BigInteger.valueOf(10);
+        BigInteger e = BigInteger.valueOf(100);
+        BigInteger n = BigInteger.valueOf(0x7f_ff_ff_ff__ff_ff_ff_ffL);
+//        m = m.multiply(m);
+//        e = e.multiply(e);
+//        n = n.multiply(n);
+//        n = n.add(BigInteger.valueOf(1));
+
+        BigInteger c = Exp(m,e);
+        System.out.println(m.toString() + "^" + e.toString() +  "=" + c.toString());
     }
 }
