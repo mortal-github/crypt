@@ -6,7 +6,7 @@ import mortal.learn.gdut.crypt.xor.XorApp;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigInteger;
-import java.util.Random;
+import java.util.*;
 
 public class MyApp {
 
@@ -127,17 +127,114 @@ public class MyApp {
         return r;
     }
 
+    /**
+     * 素数产生的概率性算法。
+     * @param l l>0,生成数介于10^l到10^(l+1)之间。
+     * @param k 检验次数。
+     * @return 返回数字或者null。该数字不是素数的概率<=2^(-2k)。
+     */
+    public static BigInteger isPrime(int l, int k, Random random){
+        assert l>0;
+        Objects.requireNonNull(random);
+        //1 pass = false
+        boolean pass = false;
+        //2. 随机地从10^l到10^(l+1)范围内任取一个奇整数n=2^t*m+1;m是n-1最大奇因子
+        BigInteger n = MyApp.random(l, random);
+        BigInteger[] mt = MyApp.getMT(n);
+        //3. 随机地从2到n-2之间取k个互不相同地整数：a1,a2,...ak;
+        if(-1 == n.compareTo(BigInteger.valueOf(k+3))){
+            k = n.intValue()-3;//n比k+3小，所以最多能取n-2-(2-1)=n-3个数字。
+        }
+        BigInteger[] a = MyApp.getA(k, n, random);
+        //4 for i=1 to k loop
+        for(int i=0; i<k; i++){
+            //5. 调用子过程Miller(n,ai),a^m(mod n)
+            pass = MyApp.Miller(a[i],mt[0],mt[1],n);
+            if(false == pass){
+                //6. pass=false, n肯定为合数。
+                //System.out.println("fail: "+ n);
+                return null;
+            }
+        }
+        //8 pass=true，则认为n可能为素数。
+        return n;
+    }
+
+    private static boolean Miller(BigInteger a, BigInteger m, BigInteger t ,BigInteger n){
+        //1. b= a^m (mode n)
+        BigInteger b = ExpMod(a,m,n);
+        //2 if b=+-1 then pass=1 and goto 8;
+        if(b.equals(BigInteger.ONE) || b.equals(BigInteger.valueOf(-1))){
+            return true;
+        }
+        //4 fro j=1 to t loop
+        while(1 == t.compareTo(BigInteger.ZERO)){
+            t = t.subtract(BigInteger.ONE);
+            //5 b=b^2 mod n
+            b = b.multiply(b).mod(n);
+            //6 if b=-1 then pass = true and goto 8
+            if(b.equals(BigInteger.ONE) || b.equals(BigInteger.valueOf(-1))){
+                return true;
+            }
+        }
+        //8
+        return false;
+    }
+
+    private static BigInteger random(int l, Random random){
+        BigInteger min = Exp(BigInteger.valueOf(10),BigInteger.valueOf(l));
+        BigInteger m = min.multiply(BigInteger.valueOf(9));
+
+        byte[] bytes = new byte[m.bitLength()/8 + 1];
+        random.nextBytes(bytes);
+
+        BigInteger result = new BigInteger(1,bytes);
+        if(result.mod(BigInteger.valueOf(2)).equals(BigInteger.ZERO)){
+            result = result.add(BigInteger.ONE);
+        }
+        result = result.mod(m);
+        result = result.add(min);
+
+        return result;
+    }
+
+    private static BigInteger[] getMT(BigInteger n){
+        BigInteger two = BigInteger.valueOf(2);
+
+        BigInteger m = n.subtract(BigInteger.ONE);
+        BigInteger t = BigInteger.valueOf(0);
+
+        while(m.mod(two).equals(BigInteger.ZERO)){
+            m = m.divide(two);
+            t = t.add(BigInteger.ONE);
+        }
+        return new BigInteger[]{m,t};
+    }
+
+    private static BigInteger[] getA(int k, BigInteger n,Random random){
+        BigInteger n_1 = n.subtract(BigInteger.valueOf(1));
+
+        BigInteger[] a = new BigInteger[k];
+        byte[] temp = new byte[n.bitLength()/8 + 1];
+
+        outer:
+        for(int i=0; i<a.length; ){
+            random.nextBytes(temp);
+            a[i] = new BigInteger(1,temp).mod(n_1);
+            if(a[i].equals(BigInteger.ONE) || a[i].equals(BigInteger.ZERO)){
+                continue outer;
+            }
+            for(int j=0; j<i; j++){
+               if(a[i].equals(a[j])){
+                   continue outer;
+               }
+            }
+            i++;
+        }
+        return a;
+    }
+
     public static void main(String[] args){
         //MyApp.show(args);
-        BigInteger m = BigInteger.valueOf(10);
-        BigInteger e = BigInteger.valueOf(100);
-        BigInteger n = BigInteger.valueOf(0x7f_ff_ff_ff__ff_ff_ff_ffL);
-//        m = m.multiply(m);
-//        e = e.multiply(e);
-//        n = n.multiply(n);
-//        n = n.add(BigInteger.valueOf(1));
-
-        BigInteger c = Exp(m,e);
-        System.out.println(m.toString() + "^" + e.toString() +  "=" + c.toString());
     }
 }
