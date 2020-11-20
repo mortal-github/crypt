@@ -91,11 +91,11 @@ public class MyApp {
     }
 
     /**
-     *
+     * 模冥运算，m^e mod n
      * @param m
      * @param e
      * @param n
-     * @return
+     * @return 模冥结果。
      */
     public static BigInteger ExpMod(BigInteger m, BigInteger e, BigInteger n){
         BigInteger c = BigInteger.valueOf(1L);
@@ -113,6 +113,12 @@ public class MyApp {
         return c;
     }
 
+    /**
+     * 冥运算a^b
+     * @param a
+     * @param b
+     * @return 冥运算结果
+     */
     public static BigInteger Exp(BigInteger a, BigInteger b){
         BigInteger r = BigInteger.valueOf(1L);
         byte[] e_b = b.toByteArray();//大端
@@ -234,7 +240,118 @@ public class MyApp {
         return a;
     }
 
+    /**
+     * 模逆运算，(a,m)=1,求a模m逆
+     * 即ax+my=1，x为a模m的逆。
+     * 故可以通过扩展欧几里得运算求x。
+     * 1. 带余除法
+     * a=q0b+r0
+     * b=q1r0+r1
+     * r0=q2r1+r2
+     * ...
+     * r_(i-2)=q_i * r_(i-1) + ri
+     * ...
+     * r_(n-2)=q_(n) * r_(n-1) + rn, rn=0;
+     * 最大公因子为r_(n-1)
+     * 2. 递推公式
+     * ri=xi * a + yi * b;
+     * xi=x_(i-2)-qi * x_(i-1)
+     * yi=y_(i-2)-qi * y_(i-2)
+     * x_(-2)=1,y_(-2)=0;
+     * x_(-1)=0,y_(-1)=1;
+     * @param a
+     * @param m
+     */
+    public static BigInteger NegMod(BigInteger a, BigInteger m){
+        assert 1 == a.compareTo(BigInteger.ZERO);
+        assert 1 == m.compareTo(BigInteger.ZERO);
+        ArrayList<BigInteger> q = new ArrayList<>();
+        boolean trun = false;
+        //辗转相除法
+        BigInteger r_i_2 ;
+        BigInteger r_i_1 ;
+        BigInteger r_i ;
+        if(1 == a.compareTo(m)){
+            r_i_2 = a;
+            r_i_1 = m;
+        }else{
+            r_i_2 = m;
+            r_i_1 = a;
+            trun = true;
+        }
+        do{
+            //带余除法
+            r_i = r_i_2.mod(r_i_1);
+            q.add(r_i_2.divide(r_i_1));
+            //更新
+            r_i_2 = r_i_1;
+            r_i_1 = r_i;
+        }while(false == r_i.equals(BigInteger.ZERO));
+       //递推公式
+        BigInteger xi_2;
+        BigInteger xi_1;
+        BigInteger xi;
+        if(trun){
+            xi_1 = BigInteger.ZERO;
+            xi  = BigInteger.ONE;
+        }else{
+            xi_1 = BigInteger.ONE;
+            xi  = BigInteger.ZERO;
+        }
+        //求1=ax+by,即r[q.size-2]=1
+        for(int i=0; i<q.size()-1; i++){
+            //进位
+            xi_2 = xi_1;
+            xi_1 = xi;
+            //递推计算
+            xi = xi_2.subtract(xi_1.multiply(q.get(i)));
+        }
+        //返回模逆结果
+        return xi;
+    }
+
+    public static BigInteger gcd(BigInteger a, BigInteger b){
+        BigInteger r_i_2;
+        BigInteger r_i_1;
+        BigInteger r_i;
+        if(1 == a.compareTo(b)){
+            r_i_2 = a;
+            r_i_1 = b;
+        }else{
+            r_i_2 = b;
+            r_i_1 = a;
+        }
+        //辗转相除
+        do{
+            r_i = r_i_2.mod(r_i_1);
+            r_i_2 = r_i_1;
+            r_i_1 = r_i;
+        }while(! r_i.equals(BigInteger.ZERO));
+        assert a.mod(r_i_2).equals(BigInteger.ZERO);
+        assert b.mod(r_i_2).equals(BigInteger.ZERO);
+        return r_i_2;
+    }
     public static void main(String[] args){
         //MyApp.show(args);
+        Random random = new Random(System.currentTimeMillis());
+        int count = 0;
+        for(int i=0; i<100*100*100; i++){
+            BigInteger a;
+            do {
+                a = MyApp.isPrime(4, 50, random);
+            } while (null == a);
+            BigInteger m;
+            m = MyApp.random(99, random);
+            if(1 != m.compareTo(BigInteger.ONE)){
+                m = BigInteger.valueOf(2);
+            }
+
+            BigInteger b = NegMod(a, m);
+            BigInteger check = a.multiply(b).mod(m);
+            if(!check.equals(BigInteger.ONE)){
+                System.out.println("check=" + check + ", gcd=" + MyApp.gcd(a, m) + ", a=" + a + ", b=" + b + ", m=" + m);
+            }
+
+        }
     }
 }
