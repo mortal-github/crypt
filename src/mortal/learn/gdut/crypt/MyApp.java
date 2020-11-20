@@ -307,6 +307,9 @@ public class MyApp {
             xi = xi_2.subtract(xi_1.multiply(q.get(i)));
         }
         //返回模逆结果
+        while(-1 == xi.compareTo(BigInteger.ZERO)){
+            xi = xi.add(m);
+        }
         return xi;
     }
 
