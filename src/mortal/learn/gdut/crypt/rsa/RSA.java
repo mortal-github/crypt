@@ -85,9 +85,9 @@ public class RSA {
 
     /**
      * 加密任意二进制数据。
-     * @param message
-     * @param e
-     * @param n
+     * @param message 带加密信息
+     * @param e 公钥
+     * @param n RSA模数
      * @return
      */
     public static byte[] encrypt(byte[] message, BigInteger e, BigInteger n){
@@ -129,7 +129,7 @@ public class RSA {
 
     /**
      * 解密任意二进制数据。
-     * @param cipher
+     * @param cipher 密文
      * @return
      */
     public byte[] decrypt(byte[] cipher){
@@ -179,7 +179,7 @@ public class RSA {
     public BigInteger getEuler_n(){
         return this.euler_n;
     }
-    
+
     public BigInteger getD(){
         return this.d;
     }
