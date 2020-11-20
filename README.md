@@ -22,3 +22,8 @@
 [git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/c4ceec9161a1cbe167de5b67091de965bf204dee)  
 [git仓库提交历史结束点](https://10.21.49.169/3118005434/crypt/commit/8d20c2a621ede731f22893aa55397fd77d3b007a)  
 ![RsaApp.png](png/RsaApp.png)  
+
+## ELGamal公钥算法分析
+[子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/elgamal)  
+[git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/a7d99377b65e89c1640125ea6a7cd4449f97591f)  
+
