@@ -1,6 +1,7 @@
 package mortal.learn.gdut.crypt;
 
 import mortal.learn.gdut.crypt.des.DesApp;
+import mortal.learn.gdut.crypt.rsa.RsaApp;
 import mortal.learn.gdut.crypt.xor.XorApp;
 
 import javax.swing.*;
@@ -23,6 +24,7 @@ public class MyApp {
 
             JFrame xor = new XorApp();
             JFrame des = new DesApp();
+            JFrame rsa = new RsaApp();
 
             JButton xor_b = new JButton("异或加密");
             xor_b.addActionListener(event->xor.setVisible(true));
@@ -31,6 +33,10 @@ public class MyApp {
             JButton des_b = new JButton("DES加密");
             des_b.addActionListener(event->des.setVisible(true));
             panel.add(des_b);
+
+            JButton rsa_b = new JButton("RSA加密");
+            rsa_b.addActionListener(event->rsa.setVisible(true));
+            panel.add(rsa_b);
         });
     }
 
