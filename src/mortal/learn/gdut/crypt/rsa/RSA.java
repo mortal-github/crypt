@@ -83,6 +83,13 @@ public class RSA {
         return result;
     }
 
+    /**
+     * 加密任意二进制数据。
+     * @param message
+     * @param e
+     * @param n
+     * @return
+     */
     public static byte[] encrypt(byte[] message, BigInteger e, BigInteger n){
         //明文分组尺寸，要求分组数值小于模数n。
         int group_size_p = (n.bitLength()-1)/8;
@@ -120,6 +127,11 @@ public class RSA {
         return cipher;
     }
 
+    /**
+     * 解密任意二进制数据。
+     * @param cipher
+     * @return
+     */
     public byte[] decrypt(byte[] cipher){
         //明文分组尺寸，要求分组数值小于模数n。
         int group_size_p = (n.bitLength()-1)/8;
@@ -155,18 +167,22 @@ public class RSA {
 
         return plain;
     }
-//
-//    private BigInteger originEncrypt(BigInteger m){
-//        if( (-1 == m.compareTo(BigInteger.ZERO))  || (1 != n.compareTo(m)))
-//            throw new IllegalArgumentException("m must less than n and must positive");
-//        return MyApp.ExpMod(m,e,n);
-//    }
-//
-//    private BigInteger originDecrypt(BigInteger c){
-//        if( (-1 == c.compareTo(BigInteger.ZERO))  || (1 != n.compareTo(c)))
-//            throw new IllegalArgumentException("m must less than n and must positive");
-//        return MyApp.ExpMod(c,d,n);
-//    }
+
+    public BigInteger getP(){
+        return this.p;
+    }
+
+    public BigInteger getQ(){
+        return this.q;
+    }
+
+    public BigInteger getEuler_n(){
+        return this.euler_n;
+    }
+    
+    public BigInteger getD(){
+        return this.d;
+    }
 
     public static void main(String[] args){
         Random random = new Random(System.currentTimeMillis());
@@ -201,7 +217,4 @@ public class RSA {
         }
         System.out.println("-----------------------");
     }
-
-
-
 }
