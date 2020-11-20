@@ -341,26 +341,26 @@ public class MyApp {
         return r_i_2;
     }
     public static void main(String[] args){
-        //MyApp.show(args);
-        Random random = new Random(System.currentTimeMillis());
-        int count = 0;
-        for(int i=0; i<100*100*100; i++){
-            BigInteger a;
-            do {
-                a = MyApp.isPrime(4, 50, random);
-            } while (null == a);
-            BigInteger m;
-            m = MyApp.random(99, random);
-            if(1 != m.compareTo(BigInteger.ONE)){
-                m = BigInteger.valueOf(2);
-            }
-
-            BigInteger b = NegMod(a, m);
-            BigInteger check = a.multiply(b).mod(m);
-            if(!check.equals(BigInteger.ONE)){
-                System.out.println("check=" + check + ", gcd=" + MyApp.gcd(a, m) + ", a=" + a + ", b=" + b + ", m=" + m);
-            }
-
-        }
+        MyApp.show(args);
+//        Random random = new Random(System.currentTimeMillis());
+//        int count = 0;
+//        for(int i=0; i<100*100*100; i++){
+//            BigInteger a;
+//            do {
+//                a = MyApp.isPrime(4, 50, random);
+//            } while (null == a);
+//            BigInteger m;
+//            m = MyApp.random(99, random);
+//            if(1 != m.compareTo(BigInteger.ONE)){
+//                m = BigInteger.valueOf(2);
+//            }
+//
+//            BigInteger b = NegMod(a, m);
+//            BigInteger check = a.multiply(b).mod(m);
+//            if(!check.equals(BigInteger.ONE)){
+//                System.out.println("check=" + check + ", gcd=" + MyApp.gcd(a, m) + ", a=" + a + ", b=" + b + ", m=" + m);
+//            }
+//
+//        }
     }
 }
