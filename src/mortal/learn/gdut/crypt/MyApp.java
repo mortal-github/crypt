@@ -432,7 +432,7 @@ public class MyApp {
      * @param p 素数p
      * @return
      */
-    private static boolean isPrimitiveRoot(BigInteger g, BigInteger[] q, BigInteger p_1, BigInteger p){
+    public static boolean isPrimitiveRoot(BigInteger g, BigInteger[] q, BigInteger p_1, BigInteger p){
         Objects.requireNonNull(g);
         Objects.requireNonNull(q);
         Objects.requireNonNull(p_1);
