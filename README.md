@@ -27,3 +27,6 @@
 [子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/elgamal)  
 [git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/a7d99377b65e89c1640125ea6a7cd4449f97591f)  
 
+## Diffie-Hellman 密钥交换协议
+[子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/dh)  
+[git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/645b8073ffe3a471107fdfa299468fa3aa107c13)  
