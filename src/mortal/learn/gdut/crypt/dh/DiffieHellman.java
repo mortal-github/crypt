@@ -9,8 +9,8 @@ import java.util.Random;
 public class DiffieHellman {
     public final BigInteger p;
     public final BigInteger g;
-    private BigInteger x;
-    public BigInteger y;
+    private BigInteger x = BigInteger.ZERO;
+    public BigInteger y = BigInteger.ONE;
     private BigInteger k;
 
     public DiffieHellman(BigInteger p, BigInteger g){
@@ -21,7 +21,7 @@ public class DiffieHellman {
             throw new IllegalArgumentException("p must be prime number");
 
         BigInteger p_1 = p.subtract(BigInteger.ONE);
-        BigInteger[] q = MyApp.getAllPrimeFactor(p);
+        BigInteger[] q = MyApp.getAllPrimeFactor(p_1);
         if( !MyApp.isPrimitiveRoot(g,q,p_1,p))
             throw new IllegalArgumentException("g must be a primitiveroot of p");
 
@@ -73,12 +73,13 @@ public class DiffieHellman {
      */
     public BigInteger getK( BigInteger y){
         Objects.requireNonNull(y);
-        assert 1 == y.compareTo(BigInteger.ONE);
+        assert 1 == y.compareTo(BigInteger.ZERO);
         assert 1 == this.p.compareTo(y);
 
         BigInteger k = MyApp.ExpMod(y,this.x,this.p);
         this.k = k;
-        
+
         return k;
     }
+
 }

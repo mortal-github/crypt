@@ -1,6 +1,7 @@
 package mortal.learn.gdut.crypt;
 
 import mortal.learn.gdut.crypt.des.DesApp;
+import mortal.learn.gdut.crypt.dh.DhApp;
 import mortal.learn.gdut.crypt.rsa.RsaApp;
 import mortal.learn.gdut.crypt.xor.XorApp;
 
@@ -25,6 +26,7 @@ public class MyApp {
             JFrame xor = new XorApp();
             JFrame des = new DesApp();
             JFrame rsa = new RsaApp();
+            JFrame dh = new DhApp();
 
             JButton xor_b = new JButton("异或加密");
             xor_b.addActionListener(event->xor.setVisible(true));
@@ -37,6 +39,10 @@ public class MyApp {
             JButton rsa_b = new JButton("RSA加密");
             rsa_b.addActionListener(event->rsa.setVisible(true));
             panel.add(rsa_b);
+
+            JButton dh_b = new JButton("Diffie-Hellman密钥交换");
+            dh_b.addActionListener(event->dh.setVisible(true));
+            panel.add(dh_b);
         });
     }
 
@@ -524,45 +530,45 @@ public class MyApp {
     }
 
     public static void main(String[] args){
-        //MyApp.show(args);
-        Random random = new Random(System.currentTimeMillis());
-        BigInteger p ;
-        BigInteger g;
-        ArrayList<BigInteger> sx;
-        BigInteger loop;
-        BigInteger e;
-        BigInteger[] result;
-        for(int i=0; i<100; i++){
-            do{
-                p = getPrime(1,50,random);
-            }while(null == p);
-           // p = BigInteger.valueOf(2);
-            //获取原根
-            g = MyApp.minPrimitiveRoot(p);
-            //构造缩系，检验原根是否正确。
-            sx  = new ArrayList<>();
-            loop = BigInteger.ZERO;
-            while(-1 == loop.compareTo(p.subtract(BigInteger.ONE))){
-                loop = loop.add(BigInteger.ONE);
-                e = MyApp.ExpMod(g,loop,p);
-                sx.add(e);
-            }
-            result = sx.toArray(new BigInteger[sx.size()]);
-            Arrays.sort(result);
-            System.out.println( p + " = " + Arrays.toString(result));
-        }
+        MyApp.show(args);
+//        Random random = new Random(System.currentTimeMillis());
+//        BigInteger p ;
+//        BigInteger g;
+//        ArrayList<BigInteger> sx;
+//        BigInteger loop;
+//        BigInteger e;
+//        BigInteger[] result;
 //        for(int i=0; i<100; i++){
-//            BigInteger n = random(2,random);
-//            n = BigInteger.valueOf(5);
-//            BigInteger[] factors = getAllPrimeFactor(n);
-//            System.out.println(n + " = " + Arrays.toString(factors));
-//            break;
+//            do{
+//                p = getPrime(1,50,random);
+//            }while(null == p);
+//           // p = BigInteger.valueOf(2);
+//            //获取原根
+//            g = MyApp.minPrimitiveRoot(p);
+//            //构造缩系，检验原根是否正确。
+//            sx  = new ArrayList<>();
+//            loop = BigInteger.ZERO;
+//            while(-1 == loop.compareTo(p.subtract(BigInteger.ONE))){
+//                loop = loop.add(BigInteger.ONE);
+//                e = MyApp.ExpMod(g,loop,p);
+//                sx.add(e);
+//            }
+//            result = sx.toArray(new BigInteger[sx.size()]);
+//            Arrays.sort(result);
+//            System.out.println( p + " = " + Arrays.toString(result));
 //        }
-//        for(int i=0; i<100; i++){
-//            BigInteger n = random(3,random);
-//            BigInteger x = simillarSqrt(n);
-//            BigInteger x_1 = x.add(BigInteger.ONE);
-//            System.out.println("x^2= " + x.multiply(x) + ", n= " + n + ", (x+1)^2= " + x_1.multiply(x_1));
-//        }
+////        for(int i=0; i<100; i++){
+////            BigInteger n = random(2,random);
+////            n = BigInteger.valueOf(5);
+////            BigInteger[] factors = getAllPrimeFactor(n);
+////            System.out.println(n + " = " + Arrays.toString(factors));
+////            break;
+////        }
+////        for(int i=0; i<100; i++){
+////            BigInteger n = random(3,random);
+////            BigInteger x = simillarSqrt(n);
+////            BigInteger x_1 = x.add(BigInteger.ONE);
+////            System.out.println("x^2= " + x.multiply(x) + ", n= " + n + ", (x+1)^2= " + x_1.multiply(x_1));
+////        }
     }
 }
