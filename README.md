@@ -27,6 +27,8 @@
 ## ELGamal公钥算法分析
 [子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/elgamal)  
 [git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/a7d99377b65e89c1640125ea6a7cd4449f97591f)  
+[git仓库提交历史结束点](https://10.21.49.169/3118005434/crypt/commit/73a46c2f45d7324e0caa4b77fee439f8e71df3dc)  
+![ELGamalApp.png](png/ELGamalApp.png)  
 
 ## Diffie-Hellman 密钥交换协议
 [子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/dh)  
