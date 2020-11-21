@@ -21,6 +21,7 @@
 [子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/rsa)  
 [git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/c4ceec9161a1cbe167de5b67091de965bf204dee)  
 [git仓库提交历史结束点](https://10.21.49.169/3118005434/crypt/commit/8d20c2a621ede731f22893aa55397fd77d3b007a)  
+**注意**：该程序并非只能加密字符串，只是为了演示方便才只使用字符串来演示。
 ![RsaApp.png](png/RsaApp.png)  
 
 ## ELGamal公钥算法分析
