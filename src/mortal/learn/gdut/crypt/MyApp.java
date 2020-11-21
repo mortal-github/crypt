@@ -2,6 +2,7 @@ package mortal.learn.gdut.crypt;
 
 import mortal.learn.gdut.crypt.des.DesApp;
 import mortal.learn.gdut.crypt.dh.DhApp;
+import mortal.learn.gdut.crypt.elgamal.ELGamalApp;
 import mortal.learn.gdut.crypt.rsa.RsaApp;
 import mortal.learn.gdut.crypt.xor.XorApp;
 
@@ -27,6 +28,7 @@ public class MyApp {
             JFrame des = new DesApp();
             JFrame rsa = new RsaApp();
             JFrame dh = new DhApp();
+            JFrame elgmal = new ELGamalApp();
 
             JButton xor_b = new JButton("异或加密");
             xor_b.addActionListener(event->xor.setVisible(true));
@@ -43,6 +45,10 @@ public class MyApp {
             JButton dh_b = new JButton("Diffie-Hellman密钥交换");
             dh_b.addActionListener(event->dh.setVisible(true));
             panel.add(dh_b);
+
+            JButton elgmal_b = new JButton("ELGamal 公钥算法");
+            elgmal_b.addActionListener(event->elgmal.setVisible(true));
+            panel.add(elgmal_b);
         });
     }
 

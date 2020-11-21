@@ -83,9 +83,6 @@ public class DhApp extends JFrame {
         right.add(rk_text,MyApp.get(0,100));
 
 
-
-
-
         size_select.addActionListener(event->{
             int size = size_select.getItemAt(size_select.getSelectedIndex());
             this.dh_left = DiffieHellman.getDiffieHellman(size,50,random);
@@ -131,13 +128,6 @@ public class DhApp extends JFrame {
 
             lk_text.setText(lk.toString());
         });
-
-
-
-
-
-
-
 
         //设置jframe框架。
         this.setTitle("Diffie-Hellman 密钥交换协议");
