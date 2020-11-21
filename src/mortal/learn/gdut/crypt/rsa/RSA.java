@@ -50,10 +50,10 @@ public class RSA {
                 round_count++;
             }
             do{
-                p = MyApp.isPrime(size,50,random);
+                p = MyApp.getPrime(size,50,random);
             }while(null == p);
             do{
-                q = MyApp.isPrime(size, 50, random);
+                q = MyApp.getPrime(size, 50, random);
             }while(null == q);
             n = p.multiply(q);
             euler_n = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
@@ -194,7 +194,7 @@ public class RSA {
             for(int j=0; j<1000; j++) {
                 BigInteger message;
                 do {
-                    message = MyApp.isPrime(99, 50, random);
+                    message = MyApp.getPrime(99, 50, random);
                 } while (null == message);
                 for(int k=0; k<11; k++){
                     message = message.multiply(message);

@@ -97,7 +97,7 @@ public class MyApp {
     }
 
     /**
-     * 模冥运算，m^e mod n
+     * 模冥运算，m^e mod n。
      * @param m
      * @param e
      * @param n
@@ -120,7 +120,7 @@ public class MyApp {
     }
 
     /**
-     * 冥运算a^b
+     * 冥运算a^b。
      * @param a
      * @param b
      * @return 冥运算结果
@@ -140,18 +140,20 @@ public class MyApp {
     }
 
     /**
-     * 素数产生的概率性算法。
-     * @param l l>0,生成数介于10^l到10^(l+1)之间。
+     * 素数的概率性校验算法。
+     * @param n 被校验数字。
      * @param k 检验次数。
      * @return 返回数字或者null。该数字不是素数的概率<=2^(-2k)。
      */
-    public static BigInteger isPrime(int l, int k, Random random){
-        assert l>0;
+    public static boolean isPrime(BigInteger n, int k, Random random){
+        //assert l>0;
+        assert 1 == n.compareTo(BigInteger.ONE);
+        Objects.requireNonNull(n);
         Objects.requireNonNull(random);
         //1 pass = false
         boolean pass = false;
         //2. 随机地从10^l到10^(l+1)范围内任取一个奇整数n=2^t*m+1;m是n-1最大奇因子
-        BigInteger n = MyApp.random(l, random);
+        //BigInteger n = MyApp.random(l, random);
         BigInteger[] mt = MyApp.getMT(n);
         //3. 随机地从2到n-2之间取k个互不相同地整数：a1,a2,...ak;
         if(-1 == n.compareTo(BigInteger.valueOf(k+3))){
@@ -163,13 +165,31 @@ public class MyApp {
             //5. 调用子过程Miller(n,ai),a^m(mod n)
             pass = MyApp.Miller(a[i],mt[0],mt[1],n);
             if(false == pass){
-                //6. pass=false, n肯定为合数。
-                //System.out.println("fail: "+ n);
-                return null;
+                //6. pass=false and goto 8, n肯定为合数。
+                break;
             }
         }
         //8 pass=true，则认为n可能为素数。
-        return n;
+        return pass;
+    }
+
+    /**
+     * 素数产生的概率性算法。
+     * @param l l>0,生成数介于10^l到10^(l+1)之间。
+     * @param k 检验次数。
+     * @return 返回数字或者null。该数字不是素数的概率<=2^(-2k)。
+     */
+    public static BigInteger getPrime(int l, int k, Random random){
+        assert l>0;
+        Objects.requireNonNull(random);
+        //1 pass = false
+        boolean pass = false;
+        //2. 随机地从10^l到10^(l+1)范围内任取一个奇整数n=2^t*m+1;m是n-1最大奇因子
+        BigInteger n = MyApp.random(l, random);
+        if(isPrime(n,k,random))
+            return n;
+        else
+            return null;
     }
 
     private static boolean Miller(BigInteger a, BigInteger m, BigInteger t ,BigInteger n){
@@ -347,7 +367,7 @@ public class MyApp {
 //        for(int i=0; i<100*100*100; i++){
 //            BigInteger a;
 //            do {
-//                a = MyApp.isPrime(4, 50, random);
+//                a = MyApp.getPrime(4, 50, random);
 //            } while (null == a);
 //            BigInteger m;
 //            m = MyApp.random(99, random);
