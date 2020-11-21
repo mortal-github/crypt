@@ -159,6 +159,10 @@ public class MyApp {
         if(-1 == n.compareTo(BigInteger.valueOf(k+3))){
             k = n.intValue()-3;//n比k+3小，所以最多能取n-2-(2-1)=n-3个数字。
         }
+        if(n.equals(BigInteger.valueOf(2)) || n.equals(BigInteger.valueOf(3))){
+            return true;//显然此时k<0;
+        }
+
         BigInteger[] a = MyApp.getA(k, n, random);
         //4 for i=1 to k loop
         for(int i=0; i<k; i++){
@@ -360,27 +364,205 @@ public class MyApp {
         assert b.mod(r_i_2).equals(BigInteger.ZERO);
         return r_i_2;
     }
+
+    /**
+     * 获取素数p的最小原根。
+     * @param p 素数p。
+     * @return g 最小原根。
+     */
+    public static BigInteger minPrimitiveRoot(BigInteger p){
+        Objects.requireNonNull(p);
+        assert 1 == p.compareTo(BigInteger.ONE);
+        assert isPrime(p,50, new Random(System.currentTimeMillis()));
+
+        if(p.equals(BigInteger.valueOf(2)))
+            return BigInteger.ONE;
+
+
+        BigInteger p_1 = p.subtract(BigInteger.ONE);
+        BigInteger[] q = MyApp.getAllPrimeFactor(p_1);
+        BigInteger g = BigInteger.ONE;
+        do{
+            g = g.add(BigInteger.ONE);
+        }while(!isPrimitiveRoot(g,q,p_1,p));
+
+        return g;
+    }
+
+    /**
+     * 获取数n的所有原根。
+     * 2的原根是1
+     * 4的原根是2
+     * 素数的原根总是存在。
+     * 设奇素数p。
+     * l是正整数，p^l的原根一定存在
+     * 若g是p的原根，g和g+p中总有一个是p^2的原根。
+     * 若g是p^2的原根，g是p^l的原根。l>=1。
+     * 2p^l的原根是存在的。
+     * 若g是p^l的原根，则g和g+p^l中奇数者是2p^l的原根。
+     * 其他形式的原根一定不存在。
+     * @param n 数n
+     * @return g n的所有原根。
+     */
+    public static BigInteger[] primitiveRoot(BigInteger n){
+        Objects.requireNonNull(n);
+        assert 1 == n.compareTo(BigInteger.ONE);
+        //2的原根是1
+        if(n.equals(BigInteger.valueOf(2))){
+            return new BigInteger[] {BigInteger.ONE};
+        }
+        //4的原根是3
+        if(n.equals(BigInteger.valueOf(3))){
+            return new BigInteger[]{BigInteger.valueOf(3)};
+        }
+
+        //如果是素数，求原根
+
+        //如果不是素数，分解为，p^2,p^l,2p^l, p是素数。求p的原根。
+
+        return null;
+    }
+
+    /**
+     * 判断a是否是奇素数p的本原元。
+     * q是p-1的所有素因子。
+     * @param g
+     * @param q p-1的所有素因子。
+     * @param p_1 p-1。
+     * @param p 素数p
+     * @return
+     */
+    private static boolean isPrimitiveRoot(BigInteger g, BigInteger[] q, BigInteger p_1, BigInteger p){
+        Objects.requireNonNull(g);
+        Objects.requireNonNull(q);
+        Objects.requireNonNull(p_1);
+        Objects.requireNonNull(p);
+        assert 1 != g.compareTo(p);
+        assert p.subtract(BigInteger.ONE).equals(p_1);
+        assert Arrays.equals(q, MyApp.getAllPrimeFactor(p_1));
+
+        for(BigInteger qi : q){
+           if( MyApp.ExpMod(g, p_1.divide(qi), p).equals(BigInteger.ONE)){
+               return false;
+           }
+        }
+        return true;
+    }
+
+    /**
+     * 获取正整数n的所有素因子。
+     * 素数没有素因子。
+     * 根据整数唯一分解定理得。
+     * 1. 素因子一定小于sqrt(n)。
+     * 2. 设n=pi0^n0 * pi1^n2 ，，，，pi是素数，由小到大排列。
+     * 3. 若从小到大寻找因子，每次都用n约去这个因子，使其结果的整数不可约这个因子，那么如此寻找小区，所找到的因子一定都是素数。
+     * 4. 证明3， 如果因子是合数，那么因子可以分解，显然因子的因子小于因子。故只要每次找到一个因子，就约去这个因子。
+     * 则pi1 < sqrt(n/(pi0&n0))。
+     * @param n 正整数n。
+     * @return factors 正整数n之前的所有素因子。
+     */
+    public static BigInteger[] getAllPrimeFactor(BigInteger n){
+        Objects.requireNonNull(n);
+        ArrayList<BigInteger> factors = new ArrayList<>();
+
+        BigInteger old = n;
+        BigInteger sqrt_n ;
+        BigInteger prime = BigInteger.ONE;
+        do{
+            //寻找最小因子,最小因子从2开始。
+            prime = prime.add(BigInteger.ONE);
+            if(n.mod(prime).equals(BigInteger.ZERO)){
+                //记录因子,且这个因子必然为素数。
+                factors.add(prime);
+                //约去素因子，使得下一次找到的因子一定为素数。
+                do{
+                    n = n.divide(prime);
+                }while(n.mod(prime).equals(BigInteger.ZERO));
+            }
+            //n的所有素因子不会大于sqrt_n。
+            sqrt_n = MyApp.simillarSqrt(n);
+        }while(1 != prime.compareTo(sqrt_n));
+        //n!=1说明整数分解时候，最大的素因子的指数为1。
+        //素数也会n!=1,
+        if( (!n.equals(old)) && (!n.equals(BigInteger.ONE))){
+            factors.add(n);
+        }
+        return factors.toArray(new BigInteger[factors.size()]);
+    }
+
+    /**
+     * 使用牛顿迭代法开平方的整数部分。
+     * 1. 牛顿迭代法
+     * 1.1 设置r是f(x)=0的根，取x0作为r的近似值。
+     * 1.2 过（x0,f(x0))做曲线y=f(x)的切线L,
+     * 1.3 L: y=f(x0)=f(x0)+f'(x0)(x-x0)
+     * 1.4 L与x轴交点的横坐标：x1=x0-f(x0)/f'(x0)
+     * 1.5 同理，重复上述的：x2=x1-f(x1)/f'(x1)
+     * 1.6 直到 xr_1 = xr-f(xr)/f'(xr),
+     * 用牛顿迭代法求n的开方
+     * 则f(x)=n-x^2
+     * f'(x)=-2x
+     * xi+1 = xi-((xi^2-n)/2xi)
+     * xi+1 = (xi^2+n)/2xi
+     * xi+1 = (xi+n/(xi))/2
+     * @param n 被开方数。
+     * @return x 开方结果。
+     */
+    private static BigInteger simillarSqrt(BigInteger n){
+        Objects.requireNonNull(n);
+        assert 1 == n.compareTo(BigInteger.ZERO);
+
+        BigInteger two = BigInteger.valueOf(2);
+        BigInteger x = BigInteger.ONE;
+        BigInteger x_1 = two;
+        //显然易得 x^2 <= n < (x+1)^2
+        while(!( (1 == x_1.multiply(x_1).compareTo(n)) && (1 != x.multiply(x).compareTo(n)) )){
+            x = x.add(n.divide(x)).divide(two);
+            x_1 = x.add(BigInteger.ONE);
+        }
+        return x;
+    }
+
     public static void main(String[] args){
-        MyApp.show(args);
-//        Random random = new Random(System.currentTimeMillis());
-//        int count = 0;
-//        for(int i=0; i<100*100*100; i++){
-//            BigInteger a;
-//            do {
-//                a = MyApp.getPrime(4, 50, random);
-//            } while (null == a);
-//            BigInteger m;
-//            m = MyApp.random(99, random);
-//            if(1 != m.compareTo(BigInteger.ONE)){
-//                m = BigInteger.valueOf(2);
-//            }
-//
-//            BigInteger b = NegMod(a, m);
-//            BigInteger check = a.multiply(b).mod(m);
-//            if(!check.equals(BigInteger.ONE)){
-//                System.out.println("check=" + check + ", gcd=" + MyApp.gcd(a, m) + ", a=" + a + ", b=" + b + ", m=" + m);
-//            }
-//
+        //MyApp.show(args);
+        Random random = new Random(System.currentTimeMillis());
+        BigInteger p ;
+        BigInteger g;
+        ArrayList<BigInteger> sx;
+        BigInteger loop;
+        BigInteger e;
+        BigInteger[] result;
+        for(int i=0; i<100; i++){
+            do{
+                p = getPrime(1,50,random);
+            }while(null == p);
+           // p = BigInteger.valueOf(2);
+            //获取原根
+            g = MyApp.minPrimitiveRoot(p);
+            //构造缩系，检验原根是否正确。
+            sx  = new ArrayList<>();
+            loop = BigInteger.ZERO;
+            while(-1 == loop.compareTo(p.subtract(BigInteger.ONE))){
+                loop = loop.add(BigInteger.ONE);
+                e = MyApp.ExpMod(g,loop,p);
+                sx.add(e);
+            }
+            result = sx.toArray(new BigInteger[sx.size()]);
+            Arrays.sort(result);
+            System.out.println( p + " = " + Arrays.toString(result));
+        }
+//        for(int i=0; i<100; i++){
+//            BigInteger n = random(2,random);
+//            n = BigInteger.valueOf(5);
+//            BigInteger[] factors = getAllPrimeFactor(n);
+//            System.out.println(n + " = " + Arrays.toString(factors));
+//            break;
+//        }
+//        for(int i=0; i<100; i++){
+//            BigInteger n = random(3,random);
+//            BigInteger x = simillarSqrt(n);
+//            BigInteger x_1 = x.add(BigInteger.ONE);
+//            System.out.println("x^2= " + x.multiply(x) + ", n= " + n + ", (x+1)^2= " + x_1.multiply(x_1));
 //        }
     }
 }
