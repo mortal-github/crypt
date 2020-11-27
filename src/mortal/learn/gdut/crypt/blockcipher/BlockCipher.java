@@ -146,13 +146,22 @@ public class BlockCipher {
         Random random = new Random(System.currentTimeMillis());
         for(int i=0; i<1000000000; i++){
             long key = random.nextLong();
-            BlockCipher block_cipher = new BlockCipher(key, 0, 0);
+            BlockCipher block_cipher = new BlockCipher(key, 0, -1);
 
-            byte[] message = new byte[8];
+            int length ;
+            do{
+                length = random.nextInt();
+            }while(length == 0);
+            if(length < 0){
+                length = -length;
+            }
+            length = length % 8;
+
+            byte[] message = new byte[length];
             random.nextBytes(message);
 
-            byte[] cipher = block_cipher.DES_encrypt64(message);
-            byte[] plain = block_cipher.DES_decrypt64(cipher);
+            byte[] cipher = block_cipher.fillEncrypt(message);
+            byte[] plain = block_cipher.fillDecrypt(cipher);
 
             if(! Arrays.equals(message,plain)){
                 System.out.println("i = " + i + ", ERROR!");
@@ -160,5 +169,40 @@ public class BlockCipher {
                 System.out.println(Arrays.toString(plain));
             }
         }
+    }
+
+    /**
+     * 短块加密，填充加密法。
+     * @param src 短块，当加密数据没有短块时，传入一个长度为0的数组。
+     * @return out 加密数据
+     */
+    private byte[] fillEncrypt(byte[] src){
+        Objects.requireNonNull(src);
+        assert src.length < 9;
+
+        int length = src.length;
+        byte[] out = new byte[8];
+        random.nextBytes(out);
+        for(int i=0; i<length; i++){
+            out[i] = src[i];
+        }
+        out[7] = (byte)length;
+
+        return this.DES_encrypt64(out);
+    }
+
+    /**
+     * 解密短块，填充加密的数据。
+     * @param src 填充加密短块的结果。
+     * @return out 解密出短块。
+     */
+    private byte[] fillDecrypt(byte[] src){
+        Objects.requireNonNull(src);
+        assert src.length == 8;
+
+        byte[] out = this.DES_decrypt64(src);
+        int length = out[7];
+
+        return Arrays.copyOf(out, length);
     }
 }
