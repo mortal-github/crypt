@@ -148,8 +148,10 @@ public class BlockCipher {
             byte[] message = new byte[length];
             random.nextBytes(message);
 
-            byte[] cipher = block_cipher.ECBEncrypt(message);
-            byte[] plain = block_cipher.ECBDecrypt(cipher);
+            long z = random.nextLong();
+
+            byte[] cipher = block_cipher.CBCEncrypt(z,message);
+            byte[] plain = block_cipher.CBCDecrypt(z,cipher);
 
             if(! Arrays.equals(message,plain)){
                 System.out.println("i = " + i + ", ERROR!");
@@ -353,6 +355,89 @@ public class BlockCipher {
             }
         }
         return out;
+    }
 
+    /**
+     * 密文链接工作模式加密。
+     * 必须是完整分组，无短块。
+     * @param z 初始向量。
+     * @param src 源数据。
+     * @return out 加密结果。
+     */
+    private byte[] CBCEncrypt(long z, byte[] src){
+        assert null != src;
+        assert 0 == src.length % 8;
+
+        byte[] last = new byte[8];
+        byte[] src_8 = new byte[8];
+        byte[] out_8 = new byte[8];
+        byte[] out = new byte[src.length];
+
+        //get初始向量
+        for(int i=0; i<8; i++){
+            last[i] |= (byte)(z&0xff);
+            z>>>=8;
+        }
+
+        for(int i=0; i<src.length; i+=8){
+            //get src_8
+            for(int j=0; j<8; j++){
+                src_8[j] = src[i+j];
+            }
+            //密文链接
+            for(int j=0; j<8; j++){
+                src_8[j] ^= last[j];
+            }
+            //加密一组
+            out_8 = DES_encrypt64(src_8);
+            //保存密文
+            for(int j=0; j<8; j++){
+                out[i+j] = out_8[j];
+                last[j] = out_8[j];
+            }
+        }
+        return out;
+    }
+
+    /**
+     * 密文链接工作模式解密。
+     * 必须是完整分组，无短块。
+     * @param z 初始向量。
+     * @param src 源数据。
+     * @return out 解密结果。
+     */
+    private byte[] CBCDecrypt(long z, byte[] src){
+        assert null != src;
+        assert 0 == src.length % 8;
+
+        byte[] last = new byte[8];
+        byte[] src_8 = new byte[8];
+        byte[] out_8 = new byte[8];
+        byte[] out = new byte[src.length];
+
+        //get初始向量
+        for(int i=0; i<8; i++){
+            last[i] |= (byte)(z&0xff);
+            z>>>=8;
+        }
+
+        for(int i=0; i<src.length; i+=8){
+            //get src_8
+            for(int j=0; j<8; j++){
+                src_8[j] = src[i +j];
+            }
+            //解密一组
+            out_8 = DES_decrypt64(src_8);
+            //解密密文链接
+            for(int j=0; j<8; j++){
+                out_8[j] ^= last[j];
+            }
+            //保存明文，密文分组
+            for(int j=0; j<8; j++){
+                out[i+j] = out_8[j];
+                last[j] = src_8[j];
+            }
+        }
+        return out;
     }
 }
