@@ -505,5 +505,31 @@ public class DESBlockEncrypt {
             }
         }
     }
+
+    public byte[] encrypt(int work_mode, int short_mode, byte[] src){
+        Objects.requireNonNull(src);
+        switch(short_mode){
+            case DESBlockEncrypt.FILL:
+                return this.fillEncrypt(work_mode, src);
+            case DESBlockEncrypt.SCE:
+                return this.sceEncrypt(work_mode, src);
+            case DESBlockEncrypt.CET:
+                return this.cetEncrypt(work_mode, src);
+            default: throw new IllegalArgumentException("illegal short_mode :" + short_mode);
+        }
+    }
+
+    public byte[] decrypt(int work_mode, int short_mode, byte[] src){
+        Objects.requireNonNull(src);
+        switch(short_mode){
+            case DESBlockEncrypt.FILL:
+                return this.fillDecrypt(work_mode, src);
+            case DESBlockEncrypt.SCE:
+                return this.sceDecrypt(work_mode, src);
+            case DESBlockEncrypt.CET:
+                return this.cetDecrypt(work_mode, src);
+            default: throw new IllegalArgumentException("illegal short_mode :" + short_mode);
+        }
+    }
 }
 

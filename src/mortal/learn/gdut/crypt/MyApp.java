@@ -1,5 +1,6 @@
 package mortal.learn.gdut.crypt;
 
+import mortal.learn.gdut.crypt.blockcipher.DesBlockEncryptApp;
 import mortal.learn.gdut.crypt.des.DesApp;
 import mortal.learn.gdut.crypt.dh.DhApp;
 import mortal.learn.gdut.crypt.elgamal.ELGamalApp;
@@ -29,6 +30,7 @@ public class MyApp {
             JFrame rsa = new RsaApp();
             JFrame dh = new DhApp();
             JFrame elgmal = new ELGamalApp();
+            JFrame desBlockEncrypt = new DesBlockEncryptApp();
 
             JButton xor_b = new JButton("异或加密");
             xor_b.addActionListener(event->xor.setVisible(true));
@@ -49,6 +51,10 @@ public class MyApp {
             JButton elgmal_b = new JButton("ELGamal 公钥算法");
             elgmal_b.addActionListener(event->elgmal.setVisible(true));
             panel.add(elgmal_b);
+
+            JButton desBlockEncrypt_b = new JButton("短块加密与工作模式(DES)");
+            desBlockEncrypt_b.addActionListener(event->desBlockEncrypt.setVisible(true));
+            panel.add(desBlockEncrypt_b);
         });
     }
 
