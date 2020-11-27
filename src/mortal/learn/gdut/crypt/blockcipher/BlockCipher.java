@@ -162,8 +162,16 @@ public class BlockCipher {
             byte[] cipher_last = new byte[8];
             random.nextBytes(cipher_last);
 
-            byte[] cipher = block_cipher.sceEncrypt(cipher_last, message);
-            byte[] plain = block_cipher.sceDecrypt(cipher_last, cipher);
+            byte[] cipher = block_cipher.cetEncrypt(cipher_last, message);
+            for(int j=0; j<8-length; j++){
+                cipher_last[length + j] = cipher[j];
+            }
+            cipher = Arrays.copyOfRange(cipher, 8-length, 8);
+            byte[] plain = block_cipher.cetDecrypt(cipher_last, cipher);
+            for(int j=0; j<8-length; j++){
+                cipher_last[length +j] = plain[j];
+            }
+            plain = Arrays.copyOfRange(plain, 8-length, 8);
 
             if(! Arrays.equals(message,plain)){
                 System.out.println("i = " + i + ", ERROR!");
@@ -252,5 +260,61 @@ public class BlockCipher {
         }
 
         return out;
+    }
+
+    /**
+     * 加密短块，密文挪用技术。
+     * Cn-1  = E_M(Mn-1, k) = a||b.
+     * Cn = E(b||Mn, K) = b'||d.
+     * @param cipher 上一个分组密文, a||b。
+     * @param src 短块，不足8个字节，Mn。
+     * @return out 短块加密, b'||d。
+     */
+    private byte[] cetEncrypt(byte[] cipher, byte[] src){
+        Objects.requireNonNull(cipher);
+        Objects.requireNonNull(src);
+        assert cipher.length == 8;
+        assert src.length < 8;
+
+        //get b||Mn
+        byte[] c_s = new byte[8];
+        int length = src.length;
+        for(int i=0; i<8-length; i++){
+            c_s[i] = cipher[length + i];
+        }
+        for(int i=8-length; i<8; i++){
+            c_s[i] = src[i-(8-length)];
+        }
+
+        return DES_encrypt64(c_s);
+    }
+
+    /**
+     * 解密短块，密文挪用激素。
+     * Cn-1  = E_M(Mn-1, k) = a||b
+     * Cn = E(b||Mn, K) = b' ||d
+     * cipher = a||b'
+     * src == d
+     * @param cipher 上一个分组密文，a||b'。
+     * @param src 短块，d。
+     * @return out 短块解密，b||Mn。
+     */
+    private byte[] cetDecrypt(byte[] cipher, byte[] src){
+        Objects.requireNonNull(cipher);
+        Objects.requireNonNull(src);
+        assert cipher.length == 8;
+        assert src.length < 8;
+
+        //get b'||d
+        byte[] c_s = new byte[8];
+        int length = src.length;
+        for(int i=0; i<8-length; i++){
+            c_s[i] = cipher[length + i];
+        }
+        for(int i=8-length; i<8; i++){
+            c_s[i] = src[i-(8-length)];
+        }
+
+        return DES_decrypt64(c_s);
     }
 }
