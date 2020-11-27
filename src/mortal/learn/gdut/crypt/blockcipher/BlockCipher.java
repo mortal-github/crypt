@@ -139,27 +139,17 @@ public class BlockCipher {
             int length ;
             do{
                 length = random.nextInt();
-            }while(length == 0);
-            if(length < 0){
-                length = -length;
-            }
-            length = length % 8;
+                if(length < 0){
+                    length = -length;
+                }
+                length %= 8*8*8;
+            }while((0 == length) || (0 != length % 8));
 
             byte[] message = new byte[length];
             random.nextBytes(message);
-            byte[] cipher_last = new byte[8];
-            random.nextBytes(cipher_last);
 
-            byte[] cipher = block_cipher.cetEncrypt(cipher_last, message);
-            for(int j=0; j<8-length; j++){
-                cipher_last[length + j] = cipher[j];
-            }
-            cipher = Arrays.copyOfRange(cipher, 8-length, 8);
-            byte[] plain = block_cipher.cetDecrypt(cipher_last, cipher);
-            for(int j=0; j<8-length; j++){
-                cipher_last[length +j] = plain[j];
-            }
-            plain = Arrays.copyOfRange(plain, 8-length, 8);
+            byte[] cipher = block_cipher.ECBEncrypt(message);
+            byte[] plain = block_cipher.ECBDecrypt(cipher);
 
             if(! Arrays.equals(message,plain)){
                 System.out.println("i = " + i + ", ERROR!");
@@ -304,5 +294,65 @@ public class BlockCipher {
         }
 
         return DES_decrypt64(c_s);
+    }
+
+
+    /**
+     * 电码本工作加密。
+     * 必须是完整分组，无短块。
+     * @param src 数据源。
+     * @return out 加密结果
+     */
+    private byte[] ECBEncrypt(byte[] src){
+        assert null != src;
+        assert 0 == src.length % 8;
+
+        byte[] src_8 = new byte[8];
+        byte[] out_8 = new byte[8];
+        byte[] out = new byte[src.length];
+
+        for(int i=0; i<src.length; i+=8){
+            //get src_8
+            for(int j=0; j<8; j++){
+                src_8[j] = src[i + j];
+            }
+            //encrypt src_8
+            out_8 = DES_encrypt64(src_8);
+            //assgin out_8 to out
+            for(int j=0; j<8; j++){
+                out[i + j] = out_8[j];
+            }
+        }
+        return out;
+    }
+
+    /**
+     * 电码本工作模式解密。
+     * 必须是完整分组，无短块。
+     * @param src 数据源。
+     * @return out 解密结果。
+     */
+    private byte[] ECBDecrypt(byte[] src){
+        assert null != src;
+        assert 0 == src.length % 8;
+
+        byte[] src_8 = new byte[8];
+        byte[] out_8 = new byte[8];
+        byte[] out = new byte[src.length];
+
+        for(int i=0; i<src.length; i+=8){
+            //get src_8
+            for(int j=0; j<8; j++){
+                src_8[j] = src[i + j];
+            }
+            //encrypt src_8
+            out_8 = DES_decrypt64(src_8);
+            //assgin out_8 to out
+            for(int j=0; j<8; j++){
+                out[i + j] = out_8[j];
+            }
+        }
+        return out;
+
     }
 }
