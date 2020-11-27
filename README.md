@@ -30,8 +30,14 @@
 [git仓库提交历史结束点](https://10.21.49.169/3118005434/crypt/commit/73a46c2f45d7324e0caa4b77fee439f8e71df3dc)  
 ![ELGamalApp.png](png/ELGamalApp.png)  
 
-## Diffie-Hellman 密钥交换协议
+## Diffie-Hellman 密钥交换协议  
 [子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/dh)  
 [git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/645b8073ffe3a471107fdfa299468fa3aa107c13)  
 [git仓库提交历史结束点](https://10.21.49.169/3118005434/crypt/commit/789839f44667708b8d8039479b3f0f5c6650427a)  
 ![DhApp.png](png/DhApp.png)  
+
+## 短块加密与工作模式(DES)
+[子程序包位置](https://10.21.49.169/3118005434/crypt/tree/master/src/mortal/learn/gdut/crypt/blockcipher)  
+[git仓库提交历史开始点](https://10.21.49.169/3118005434/crypt/commit/20b97671c4ac9cbd0b1b3dec628d707f54e0aaba)  
+[git仓库提交历史结束点](https://10.21.49.169/3118005434/crypt/commit/10b199f942e420d754efd77a795e7ef9d97dffd8)  
+![DhApp.png](png/DesBlockEncryptApp.png)  
