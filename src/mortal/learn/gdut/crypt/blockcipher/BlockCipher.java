@@ -51,22 +51,11 @@ public class BlockCipher {
      */
     public static final int CET = -3;
 
-    private int work_mode;
-    private int short_block_mode;
     private long[] encrypt_keys;
     private long[] decrypt_keys;
-    private Random random ;
+    private static Random random = new Random(System.currentTimeMillis());
 
-    public BlockCipher(long key, int work_mode, int short_block_mode){
-        if(work_mode<0 || 5<work_mode){
-            throw new IllegalArgumentException("work_mode must between 0 to 5");
-        }
-        if(short_block_mode<-3 || -1<short_block_mode){
-            throw new IllegalArgumentException("work_mode must between -1 to -3");
-        }
-
-        this.work_mode = work_mode;
-        this.short_block_mode = short_block_mode;
+    public BlockCipher(long key){
         this.encrypt_keys = DES.getSubKeys(key);
         this.decrypt_keys = DES.getSubKeys(key);
         for(int i=0; i<this.decrypt_keys.length/2; i++){
@@ -74,8 +63,6 @@ public class BlockCipher {
             this.decrypt_keys[i] = this.decrypt_keys[this.decrypt_keys.length-1-i];
             this.decrypt_keys[this.decrypt_keys.length-1-i] = temp;
         }
-
-        this.random = new Random(System.currentTimeMillis());
     }
 
     /**
@@ -134,7 +121,7 @@ public class BlockCipher {
         Random random = new Random(System.currentTimeMillis());
         for(int i=0; i<1000000000; i++){
             long key = random.nextLong();
-            BlockCipher block_cipher = new BlockCipher(key, 0, -1);
+            BlockCipher block_cipher = new BlockCipher(key);
 
             int length ;
             do{
