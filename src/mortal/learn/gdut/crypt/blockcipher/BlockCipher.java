@@ -159,9 +159,11 @@ public class BlockCipher {
 
             byte[] message = new byte[length];
             random.nextBytes(message);
+            byte[] cipher_last = new byte[8];
+            random.nextBytes(cipher_last);
 
-            byte[] cipher = block_cipher.fillEncrypt(message);
-            byte[] plain = block_cipher.fillDecrypt(cipher);
+            byte[] cipher = block_cipher.sceEncrypt(cipher_last, message);
+            byte[] plain = block_cipher.sceDecrypt(cipher_last, cipher);
 
             if(! Arrays.equals(message,plain)){
                 System.out.println("i = " + i + ", ERROR!");
@@ -178,7 +180,7 @@ public class BlockCipher {
      */
     private byte[] fillEncrypt(byte[] src){
         Objects.requireNonNull(src);
-        assert src.length < 9;
+        assert src.length < 8;
 
         int length = src.length;
         byte[] out = new byte[8];
@@ -204,5 +206,49 @@ public class BlockCipher {
         int length = out[7];
 
         return Arrays.copyOf(out, length);
+    }
+
+    /**
+     * 加密短块，序列密码加密法。
+     * @param cipher 上一个分组的密文。
+     * @param src 短块数据，不足8个字节。
+     * @return out 短块加密结果。
+     */
+    private byte[] sceEncrypt(byte[] cipher, byte[] src){
+        Objects.requireNonNull(cipher);
+        Objects.requireNonNull(src);
+        assert cipher.length == 8;
+        assert src.length < 8;
+
+        //Cn = Mn XOR MSBu(E(Cn-1, K))
+        int length = src.length;
+        byte[] out = new byte[length];
+        for(int i=0; i<length; i++){
+            out[i] |= src[i] ^ cipher[ 8-length+i];
+        }
+        return out;
+    }
+
+    /**
+     * 解密短块，序列密码加密法。
+     * @param cipher 上一个分组密文。
+     * @param src 短块密文数据。
+     * @return out 短块解密结果。
+     */
+    private byte[] sceDecrypt(byte[] cipher, byte[] src){
+        Objects.requireNonNull(cipher);
+        Objects.requireNonNull(src);
+        assert cipher.length == 8;
+        assert src.length < 8;
+
+        //Cn = Mn XOR MSBu(E(Cn-1, K))
+        //Mn = Cn XOR MSBu(E(Cn-1, K))
+        int length = src.length;
+        byte[] out = new byte[length];
+        for(int i=0; i<length; i++){
+            out[i] |= src[i] ^ cipher[ 8-length+i];
+        }
+
+        return out;
     }
 }
