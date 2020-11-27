@@ -51,11 +51,13 @@ public class BlockCipher {
      */
     public static final int CET = -3;
 
+    private long IV;
     private long[] encrypt_keys;
     private long[] decrypt_keys;
     private static Random random = new Random(System.currentTimeMillis());
 
-    public BlockCipher(long key){
+    public BlockCipher(long key, long IV){
+        this.IV = IV;
         this.encrypt_keys = DES.getSubKeys(key);
         this.decrypt_keys = DES.getSubKeys(key);
         for(int i=0; i<this.decrypt_keys.length/2; i++){
@@ -121,7 +123,7 @@ public class BlockCipher {
         Random random = new Random(System.currentTimeMillis());
         for(int i=0; i<1000000000; i++){
             long key = random.nextLong();
-            BlockCipher block_cipher = new BlockCipher(key);
+            BlockCipher block_cipher = new BlockCipher(key, random.nextLong());
 
             int length ;
             do{
@@ -135,10 +137,8 @@ public class BlockCipher {
             byte[] message = new byte[length];
             random.nextBytes(message);
 
-            long z = random.nextLong();
-
-            byte[] cipher = block_cipher.CBCEncrypt(z,message);
-            byte[] plain = block_cipher.CBCDecrypt(z,cipher);
+            byte[] cipher = block_cipher.CBCEncrypt(message);
+            byte[] plain = block_cipher.CBCDecrypt(cipher);
 
             if(! Arrays.equals(message,plain)){
                 System.out.println("i = " + i + ", ERROR!");
@@ -347,11 +347,10 @@ public class BlockCipher {
     /**
      * 密文链接工作模式加密。
      * 必须是完整分组，无短块。
-     * @param z 初始向量。
      * @param src 源数据。
      * @return out 加密结果。
      */
-    private byte[] CBCEncrypt(long z, byte[] src){
+    private byte[] CBCEncrypt(byte[] src){
         assert null != src;
         assert 0 == src.length % 8;
 
@@ -362,8 +361,8 @@ public class BlockCipher {
 
         //get初始向量
         for(int i=0; i<8; i++){
-            last[i] |= (byte)(z&0xff);
-            z>>>=8;
+            last[i] |= (byte)(this.IV &0xff);
+            IV >>>=8;
         }
 
         for(int i=0; i<src.length; i+=8){
@@ -389,11 +388,10 @@ public class BlockCipher {
     /**
      * 密文链接工作模式解密。
      * 必须是完整分组，无短块。
-     * @param z 初始向量。
      * @param src 源数据。
      * @return out 解密结果。
      */
-    private byte[] CBCDecrypt(long z, byte[] src){
+    private byte[] CBCDecrypt(byte[] src){
         assert null != src;
         assert 0 == src.length % 8;
 
@@ -404,8 +402,8 @@ public class BlockCipher {
 
         //get初始向量
         for(int i=0; i<8; i++){
-            last[i] |= (byte)(z&0xff);
-            z>>>=8;
+            last[i] |= (byte)(this.IV &0xff);
+            IV >>>=8;
         }
 
         for(int i=0; i<src.length; i+=8){
@@ -427,4 +425,5 @@ public class BlockCipher {
         }
         return out;
     }
+
 }
