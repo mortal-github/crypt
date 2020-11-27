@@ -150,7 +150,8 @@ public class BlockCipher {
 
     /**
      * 短块加密，填充加密法。
-     * @param src 短块，当加密数据没有短块时，传入一个长度为0的数组。
+     * 没有短块时，传入一个长度为0的数组。
+     * @param src 短块。
      * @return out 加密数据
      */
     private byte[] fillEncrypt(byte[] src){
@@ -170,7 +171,7 @@ public class BlockCipher {
 
     /**
      * 解密短块，填充加密的数据。
-     * @param src 填充加密短块的结果。
+     * @param src 一定是填充加密短块的结果。
      * @return out 解密出短块。
      */
     private byte[] fillDecrypt(byte[] src){
@@ -185,6 +186,7 @@ public class BlockCipher {
 
     /**
      * 加密短块，序列密码加密法。
+     * 没有短块，即src.length=0时候，不做任何处理，即返回byte[0];
      * @param cipher 上一个分组的密文。
      * @param src 短块数据，不足8个字节。
      * @return out 短块加密结果。
@@ -194,6 +196,10 @@ public class BlockCipher {
         Objects.requireNonNull(src);
         assert cipher.length == 8;
         assert src.length < 8;
+
+        if( 0 == src.length){
+            return new byte[0];
+        }
 
         //Cn = Mn XOR MSBu(E(Cn-1, K))
         int length = src.length;
@@ -207,6 +213,7 @@ public class BlockCipher {
 
     /**
      * 解密短块，序列密码加密法。
+     * 没有短块， 即src.length=0时候，不做任何处理，即返回byte[0]。
      * @param cipher 上一个分组密文。
      * @param src 短块密文数据。
      * @return out 短块解密结果。
@@ -216,6 +223,10 @@ public class BlockCipher {
         Objects.requireNonNull(src);
         assert cipher.length == 8;
         assert src.length < 8;
+
+        if( 0 == src.length){
+            return new byte[0];
+        }
 
         //Cn = Mn XOR MSBu(E(Cn-1, K))
         //Mn = Cn XOR MSBu(E(Cn-1, K))
@@ -231,6 +242,7 @@ public class BlockCipher {
 
     /**
      * 加密短块，密文挪用技术。
+     * 没有短块， 即src.length=0时候，不做任何处理，即返回byte[0]。
      * Cn-1  = E_M(Mn-1, k) = a||b.
      * Cn = E(b||Mn, K) = b'||d.
      * @param cipher 上一个分组密文, a||b。
@@ -242,6 +254,10 @@ public class BlockCipher {
         Objects.requireNonNull(src);
         assert cipher.length == 8;
         assert src.length < 8;
+
+        if( 0 == src.length){
+            return new byte[0];
+        }
 
         //get b||Mn
         byte[] c_s = new byte[8];
@@ -257,7 +273,8 @@ public class BlockCipher {
     }
 
     /**
-     * 解密短块，密文挪用激素。
+     * 解密短块，密文挪用技术。
+     * 没有短块， 即src.length=0时候，不做任何处理，即返回byte[0]。
      * Cn-1  = E_M(Mn-1, k) = a||b
      * Cn = E(b||Mn, K) = b' ||d
      * cipher = a||b'
@@ -272,6 +289,10 @@ public class BlockCipher {
         assert cipher.length == 8;
         assert src.length < 8;
 
+        if( 0 == src.length){
+            return new byte[0];
+        }
+
         //get b'||d
         byte[] c_s = new byte[8];
         int length = src.length;
@@ -285,7 +306,52 @@ public class BlockCipher {
         return DES_decrypt64(c_s);
     }
 
+    /**
+     * 按指定工作模式DES加密。
+     * @param mode 工作模式代码。
+     * @param src 数据源。
+     * @return out 加密结果。
+     */
+    private byte[] encryptBlocks(int mode, byte[] src){
+        assert null != src;
+        assert 0 == src.length % 8;
 
+        byte[] out;
+        switch(mode){
+            case BlockCipher.ECB:
+                out = this.ECBEncrypt(src);
+                break;
+            case BlockCipher.CBC:
+                out = this.CBCEncrypt(src);
+                break;
+            default:throw new IllegalArgumentException("illegal mode : " + mode);
+        }
+        return out;
+    }
+
+    /**
+     * 按指定模式DES解密。
+     * @param mode 指定工作模式。
+     * @param src 数据源。
+     * @return out 解密结果。
+     */
+    private byte[] decryptBlocks(int mode, byte[] src){
+        assert null != src;
+        assert 0 == src.length % 8;
+
+        byte[] out;
+        switch(mode){
+            case BlockCipher.ECB:
+                out = this.ECBDecrypt(src);
+                break;
+            case BlockCipher.CBC:
+                out = this.CBCDecrypt(src);
+                break;
+            default:throw new IllegalArgumentException("illegal mode : " + mode);
+        }
+        return out;
+    }
+    
     /**
      * 电码本工作加密。
      * 必须是完整分组，无短块。
@@ -361,8 +427,7 @@ public class BlockCipher {
 
         //get初始向量
         for(int i=0; i<8; i++){
-            last[i] |= (byte)(this.IV &0xff);
-            IV >>>=8;
+            last[i] |= (byte)( (this.IV>>>(i*8)) & 0xff);
         }
 
         for(int i=0; i<src.length; i+=8){
@@ -402,8 +467,7 @@ public class BlockCipher {
 
         //get初始向量
         for(int i=0; i<8; i++){
-            last[i] |= (byte)(this.IV &0xff);
-            IV >>>=8;
+            last[i] |= (byte)( (this.IV>>>(i*8)) & 0xff);
         }
 
         for(int i=0; i<src.length; i+=8){
@@ -425,5 +489,6 @@ public class BlockCipher {
         }
         return out;
     }
+
 
 }
