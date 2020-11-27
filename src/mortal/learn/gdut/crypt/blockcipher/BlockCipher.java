@@ -53,6 +53,24 @@ public class BlockCipher {
 
     private int work_mode;
     private int short_block_mode;
+    private long[] encrypt_keys;
+    private long[] decrypt_keys;
+    private Random random ;
+
+    public BlockCipher(long key, int work_mode, int short_block_mode){
+        if(work_mode<0 || 5<work_mode){
+            throw new IllegalArgumentException("work_mode must between 0 to 5");
+        }
+        if(short_block_mode<-3 || -1<short_block_mode){
+            throw new IllegalArgumentException("work_mode must between -1 to -3");
+        }
+
+        this.work_mode = work_mode;
+        this.short_block_mode = short_block_mode;
+        this.encrypt_keys = DES_getSubKeysForEncrypt(key);
+        this.decrypt_keys = DES_getSubKeysForDecrypt(key);
+        this.random = new Random(System.currentTimeMillis());
+    }
 
     private static long[] DES_getSubKeysForEncrypt(long key){
         //获取加密子密钥
@@ -74,15 +92,12 @@ public class BlockCipher {
 
     /**
      * 加密64位数据。
-     * @param keys 加密子密钥。
      * @param src 数据源，8个字节。
      * @return out 加密结果。
      */
-    private static byte[] DES_encrypt64(long[] keys, byte[] src){
-        Objects.requireNonNull(keys);
+    private byte[] DES_encrypt64(byte[] src){
         Objects.requireNonNull(src);
         assert src.length == 8;
-        assert keys.length == 16;
 
         long src_long = 0;
         long out_long ;
@@ -91,7 +106,7 @@ public class BlockCipher {
         for(int i=0; i<8; i++){
             src_long |=  (((long)src[i])&0xff) << (i*8);
         }
-        out_long = DES.R(src_long, keys);
+        out_long = DES.R(src_long, this.encrypt_keys);
 
         for(int i=0; i<8; i++){
             out[i] |= (out_long & 0xff);
@@ -103,15 +118,12 @@ public class BlockCipher {
 
     /**
      * 解密64位数据。
-     * @param keys 解密子密钥
      * @param src 数据源，8个字节。
      * @return out 解密结果。
      */
-    private static byte[] DES_decrypt64(long[] keys, byte[] src){
-        Objects.requireNonNull(keys);
+    private byte[] DES_decrypt64( byte[] src){
         Objects.requireNonNull(src);
         assert src.length == 8;
-        assert keys.length == 16;
 
         long src_long = 0;
         long out_long ;
@@ -120,7 +132,7 @@ public class BlockCipher {
         for(int i=0; i<8; i++){
             src_long |=  (((long)src[i])&0xff) << (i*8);
         }
-        out_long = DES.R(src_long, keys);
+        out_long = DES.R(src_long, this.decrypt_keys);
 
         for(int i=0; i<8; i++){
             out[i] |= (out_long & 0xff);
@@ -132,16 +144,15 @@ public class BlockCipher {
 
     public static void main(String[] args){
         Random random = new Random(System.currentTimeMillis());
-        for(int i=0; i<10000000; i++){
+        for(int i=0; i<1000000000; i++){
             long key = random.nextLong();
-            long[] encrypt_keys = DES_getSubKeysForEncrypt(key);
-            long[] decrypt_keys = DES_getSubKeysForDecrypt(key);
+            BlockCipher block_cipher = new BlockCipher(key, 0, 0);
 
             byte[] message = new byte[8];
             random.nextBytes(message);
 
-            byte[] cipher = DES_encrypt64(encrypt_keys, message);
-            byte[] plain = DES_decrypt64(decrypt_keys, cipher);
+            byte[] cipher = block_cipher.DES_encrypt64(message);
+            byte[] plain = block_cipher.DES_decrypt64(cipher);
 
             if(! Arrays.equals(message,plain)){
                 System.out.println("i = " + i + ", ERROR!");
@@ -149,6 +160,5 @@ public class BlockCipher {
                 System.out.println(Arrays.toString(plain));
             }
         }
-
     }
 }
