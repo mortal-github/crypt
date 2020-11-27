@@ -67,27 +67,15 @@ public class BlockCipher {
 
         this.work_mode = work_mode;
         this.short_block_mode = short_block_mode;
-        this.encrypt_keys = DES_getSubKeysForEncrypt(key);
-        this.decrypt_keys = DES_getSubKeysForDecrypt(key);
-        this.random = new Random(System.currentTimeMillis());
-    }
-
-    private static long[] DES_getSubKeysForEncrypt(long key){
-        //获取加密子密钥
-        long[] keys = DES.getSubKeys(key);
-        return keys;
-    }
-
-    private static long[] DES_getSubKeysForDecrypt(long key){
-        //获取加密子密钥
-        long[] keys = DES.getSubKeys(key);
-        //获取解密子密钥
-        for(int i=0; i<keys.length/2; i++){
-            long temp = keys[i];
-            keys[i] = keys[keys.length-1-i];
-            keys[keys.length-1-i] = temp;
+        this.encrypt_keys = DES.getSubKeys(key);
+        this.decrypt_keys = DES.getSubKeys(key);
+        for(int i=0; i<this.decrypt_keys.length/2; i++){
+            long temp = this.decrypt_keys[i];
+            this.decrypt_keys[i] = this.decrypt_keys[this.decrypt_keys.length-1-i];
+            this.decrypt_keys[this.decrypt_keys.length-1-i] = temp;
         }
-        return keys;
+
+        this.random = new Random(System.currentTimeMillis());
     }
 
     /**
