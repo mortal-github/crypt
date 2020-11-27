@@ -223,6 +223,7 @@ public class BlockCipher {
         //Cn = Mn XOR MSBu(E(Cn-1, K))
         int length = src.length;
         byte[] out = new byte[length];
+        cipher = this.DES_encrypt64(cipher);
         for(int i=0; i<length; i++){
             out[i] |= src[i] ^ cipher[ 8-length+i];
         }
@@ -245,6 +246,7 @@ public class BlockCipher {
         //Mn = Cn XOR MSBu(E(Cn-1, K))
         int length = src.length;
         byte[] out = new byte[length];
+        cipher = this.DES_encrypt64(cipher);
         for(int i=0; i<length; i++){
             out[i] |= src[i] ^ cipher[ 8-length+i];
         }
